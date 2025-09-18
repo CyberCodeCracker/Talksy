@@ -10,7 +10,7 @@ services:
     volumes:
       - postgres:/data/postgres
     ports:
-      - 5443:5442
+      - 5432:5432
     networks:
       - talksy
     restart: unless-stopped
