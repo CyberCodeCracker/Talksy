@@ -1,8 +1,7 @@
-package com.amouri_dev.talksy.message;
+package com.amouri_dev.talksy.entities.message;
 
-import com.amouri_dev.talksy.chat.Chat;
+import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.common.BaseAuditingEntity;
-import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

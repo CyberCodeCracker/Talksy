@@ -1,16 +1,15 @@
-package com.amouri_dev.talksy.chat;
+package com.amouri_dev.talksy.entities.chat;
 
 import com.amouri_dev.talksy.common.BaseAuditingEntity;
-import com.amouri_dev.talksy.message.Message;
-import com.amouri_dev.talksy.message.MessageState;
-import com.amouri_dev.talksy.message.MessageType;
-import com.amouri_dev.talksy.user.User;
+import com.amouri_dev.talksy.entities.message.Message;
+import com.amouri_dev.talksy.entities.message.MessageState;
+import com.amouri_dev.talksy.entities.message.MessageType;
+import com.amouri_dev.talksy.entities.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.core.annotation.Order;
 
 import java.time.LocalDateTime;
 import java.util.List;
