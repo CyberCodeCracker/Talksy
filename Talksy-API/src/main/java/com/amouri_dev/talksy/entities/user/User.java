@@ -39,6 +39,9 @@ public class User extends BaseAuditingEntity implements UserDetails {
     @Column(name = "LAST_NAME")
     private String lastName;
 
+    @Column(name = "NICKNAME")
+    private String nickname;
+
     @Email
     @Column(name = "EMAIL", unique = true, nullable = false)
     private String email;

@@ -22,4 +22,5 @@ app:
     jwt:
       access-token-expiration: 86400000 # 24 hours
       refresh-token-expiration: 604800000 # 7 days
+    disposable-email: 10 Minute Mail, Temp Mail, Guerrilla Mail, Mailinator, Proton Mail (Temp), YOPmail, Dispostable, EmailOnDeck, Burner Mail, Temp-Mail.org, Internxt Temp Mail, AdGuard Temp Mail, 33 Mail, Spamgourmet, Mohmal
 
