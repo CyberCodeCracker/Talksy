@@ -1,5 +1,6 @@
 package com.amouri_dev.talksy.entities.user.auth;
 
+import com.amouri_dev.talksy.validation.NonDisposableEmail;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
@@ -42,7 +43,7 @@ public class RegistrationRequest {
     @NotBlank(message = "Email is necessary")
     @Email(message = "Please provide a correct email format")
     @Schema(example = "souhail@gmail.com")
-    //  @NonDisposableEmail(message = "Please provide a valid email")
+    @NonDisposableEmail(message = "Please provide a valid email")
     private String email;
     @NotBlank(message = "Password is necessary")
     @Size(

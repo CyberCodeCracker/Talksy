@@ -1,6 +1,7 @@
 package com.amouri_dev.talksy.validation;
 
 import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -12,4 +13,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = EmailDomainValidator.class)
 public @interface NonDisposableEmail {
 
+    String message() default "Disposable email addresses are not allowed";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
 }
