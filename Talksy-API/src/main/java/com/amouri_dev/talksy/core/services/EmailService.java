@@ -1,5 +1,6 @@
 package com.amouri_dev.talksy.core.services;
 
+import com.amouri_dev.talksy.core.Iservices.IEmailService;
 import com.amouri_dev.talksy.entities.email.EmailTemplateName;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -22,12 +23,12 @@ import static org.springframework.mail.javamail.MimeMessageHelper.MULTIPART_MODE
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailService implements IEmailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
 
-    @Value("${spring.application.mail.from-email}")
+    @Value("${app.mail.from-email}")
     private String fromEmail;
 
     @Async

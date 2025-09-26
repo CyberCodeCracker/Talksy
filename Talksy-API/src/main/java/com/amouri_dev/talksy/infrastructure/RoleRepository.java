@@ -1,5 +1,6 @@
-package com.amouri_dev.talksy.entities.role;
+package com.amouri_dev.talksy.infrastructure;
 
+import com.amouri_dev.talksy.entities.role.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
