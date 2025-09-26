@@ -6,7 +6,7 @@ import com.amouri_dev.talksy.entities.user.UserMapper;
 import com.amouri_dev.talksy.entities.user.request.UpdatePasswordRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import com.amouri_dev.talksy.exception.BusinessException;
-import com.amouri_dev.talksy.exception.Errorcode;
+import com.amouri_dev.talksy.exception.ErrorCode;
 import com.amouri_dev.talksy.infrastructure.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class UserService implements IUserService {
         final User user = this.findUserById(userId);
         if (!this.passwordEncoder.matches(request.getOldPassword(),
                 user.getPassword())) {
-            throw new BusinessException(Errorcode.INVALID_CURRENT_PASSWORD);
+            throw new BusinessException(ErrorCode.INVALID_CURRENT_PASSWORD);
         }
         final String encodedPassword = this.passwordEncoder.encode(request.getNewPassword());
         user.setPassword(encodedPassword);
@@ -50,7 +50,7 @@ public class UserService implements IUserService {
     public void deactivateAccount(Long userId) {
         final User user = this.findUserById(userId);
         if (!user.isLocked()) {
-            throw new BusinessException(Errorcode.ACCOUNT_ALREADY_DEACTIVATED);
+            throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_DEACTIVATED);
         }
         user.setLocked(true);
         this.userRepository.save(user);
@@ -60,7 +60,7 @@ public class UserService implements IUserService {
     public void reactivateAccount(Long userId) {
         final User user = this.findUserById(userId);
         if (user.isLocked()) {
-            throw new BusinessException(Errorcode.ACCOUNT_ALREADY_ACTIVATED);
+            throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_ACTIVATED);
         }
         user.setLocked(false);
         this.userRepository.save(user);
@@ -85,6 +85,6 @@ public class UserService implements IUserService {
 
     private User findUserById(Long userId) {
         return this.userRepository.findUserById(userId)
-                .orElseThrow(() -> new BusinessException(Errorcode.USER_NOT_FOUND, userId));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND, userId));
     }
 }

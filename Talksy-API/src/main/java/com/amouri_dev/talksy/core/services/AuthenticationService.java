@@ -10,10 +10,12 @@ import com.amouri_dev.talksy.entities.user.auth.AuthenticationResponse;
 import com.amouri_dev.talksy.entities.user.auth.RefreshRequest;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import com.amouri_dev.talksy.exception.BusinessException;
-import com.amouri_dev.talksy.exception.Errorcode;
+import com.amouri_dev.talksy.exception.ErrorCode;
 import com.amouri_dev.talksy.infrastructure.UserRepository;
 import com.amouri_dev.talksy.security.JwtService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -81,6 +83,11 @@ public class AuthenticationService implements IAuthenticationService {
         user.setRoles(roles);
 
         this.roleRepository.save(userRole);
+        sendValidationEmail(request.getEmail());
+    }
+
+    private void sendValidationEmail(@NotBlank(message = "Email is necessary") @Email(message = "Please provide a correct email format") String email) {
+
     }
 
     @Override
@@ -98,7 +105,7 @@ public class AuthenticationService implements IAuthenticationService {
     private void checkUserEmail(String email) {
         final boolean exists = userRepository.findByEmail(email).isPresent();
         if (exists) {
-            throw new BusinessException(Errorcode.ACCOUNT_ALREADY_EXISTS);
+            throw new BusinessException(ErrorCode.ACCOUNT_ALREADY_EXISTS);
         }
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 
 
 @Getter
-public enum Errorcode {
+public enum ErrorCode {
 
     USER_NOT_FOUND("USER_NOT_FOUND", "User not found with id %s", HttpStatus.NOT_FOUND),
     INVALID_CURRENT_PASSWORD("INVALID_CURRENT_PASSWORD", "Invalid current password" , HttpStatus.BAD_REQUEST),
@@ -17,7 +17,7 @@ public enum Errorcode {
     private final String defaultMessage;
     private final HttpStatus httpStatus;
 
-    Errorcode(final String code,
+    ErrorCode(final String code,
               final String defaultMessage,
               final HttpStatus httpStatus) {
         this.code = code;
