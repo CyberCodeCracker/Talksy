@@ -23,9 +23,8 @@ import java.util.List;
 public class Chat extends BaseAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "CHAT_ID", columnDefinition = "BIGSERIAL")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "chat_seq")
+    @SequenceGenerator(name = "chat_seq", sequenceName = "chat_seq", allocationSize = 1)    private Long id;
     @ManyToOne
     @JoinColumn(name = "SENDER_ID")
     private User sender;

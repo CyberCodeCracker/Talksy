@@ -12,7 +12,8 @@ public class AppAuditorAware implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
 
         if (authentication ==  null ||
                 !authentication.isAuthenticated() ||

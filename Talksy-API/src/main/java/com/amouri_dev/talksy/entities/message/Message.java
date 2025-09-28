@@ -17,8 +17,8 @@ import lombok.Setter;
 public class Message extends BaseAuditingEntity {
 
     @Id
-    @SequenceGenerator(name = "msg_seq", sequenceName = "MSG_SEQ", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "msg_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mess_seq")
+    @SequenceGenerator(name = "mess_seq", sequenceName = "mess_seq", allocationSize = 1)
     private Long id;
     @Column(columnDefinition = "TEXT")
     private String content;

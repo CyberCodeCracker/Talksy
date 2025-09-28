@@ -6,6 +6,7 @@ import com.amouri_dev.talksy.entities.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,7 +22,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "USERS")
 public class User extends BaseAuditingEntity implements UserDetails {
@@ -29,8 +30,8 @@ public class User extends BaseAuditingEntity implements UserDetails {
     private static final int LAST_ACTIVE_INTERVAL = 5;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
-    @Column(name = "USER_ID", columnDefinition = "BIGSERIAL")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "FIRST_NAME")
@@ -70,7 +71,7 @@ public class User extends BaseAuditingEntity implements UserDetails {
     @OneToMany(mappedBy = "sender")
     private List<Chat> chatsAsSender;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "recipient")
     private List<Chat> chatsAsReceiver;
 
     @ManyToMany(

@@ -6,6 +6,7 @@ import com.amouri_dev.talksy.entities.user.auth.AuthenticationResponse;
 import com.amouri_dev.talksy.entities.user.auth.RefreshRequest;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class AuthenticationController {
     @ResponseStatus(code = HttpStatus.CREATED)
     public void register(
             @Valid @RequestBody final RegistrationRequest request
-    ) {
+    ) throws MessagingException {
         this.authenticationService.register(request);
     }
 

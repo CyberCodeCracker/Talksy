@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.infrastructure;
 
 import com.amouri_dev.talksy.entities.message.Message;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
             WHERE messages.chat.id = :chatId
             ORDER BY messages.createdDate
             """)
-    Page<Message> getMessagesByChatId(Long id);
+    Page<Message> getMessagesByChatId(Long id, Pageable pageable);
     @Modifying(clearAutomatically = true)
     @Query("""
             UPDATE Message

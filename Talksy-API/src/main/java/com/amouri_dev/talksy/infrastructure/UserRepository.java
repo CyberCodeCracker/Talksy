@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.infrastructure;
 
 import com.amouri_dev.talksy.entities.user.User;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,6 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             FROM User user
             where user.email != :email
             """)
-    Page<User> findAllUsersExceptSelf(String email, int page, int size);
+    Page<User> findAllUsersExceptSelf(String email, Pageable pageable);
     Optional<User> findUserById(Long id);
 }

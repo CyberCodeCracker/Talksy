@@ -23,8 +23,8 @@ import java.util.Set;
 public class Role extends BaseAuditingEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ROLE_ID", columnDefinition = "BIGSERIAL")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_seq")
+    @SequenceGenerator(name = "role_seq", sequenceName = "role_seq", allocationSize = 1)
     private Long id;
 
     private String name;

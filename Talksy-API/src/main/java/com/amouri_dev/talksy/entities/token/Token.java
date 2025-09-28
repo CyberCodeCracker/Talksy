@@ -15,8 +15,8 @@ import java.time.LocalDateTime;
 public class Token {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "tok_seq")
+    @SequenceGenerator(name = "tok_seq", sequenceName = "tok_seq", allocationSize = 1)
     private Long id;
     @Column(name = "TOKEN", unique = true, nullable = false, length = 2048)
     private String token;
