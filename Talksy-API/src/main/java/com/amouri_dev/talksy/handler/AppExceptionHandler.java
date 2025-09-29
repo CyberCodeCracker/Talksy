@@ -118,7 +118,7 @@ public class AppExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception e) {
-        log.error("Unexpected exception", e.getCause());
+        log.error("Unexpected exception", e.getMessage());
         final ErrorResponse response = ErrorResponse.builder()
                 .code(ErrorCode.INTERNAL_EXCEPTION.getCode())
                 .message(ErrorCode.INTERNAL_EXCEPTION.getDefaultMessage())

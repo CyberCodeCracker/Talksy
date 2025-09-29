@@ -2,11 +2,16 @@ package com.amouri_dev.talksy.entities.user;
 
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserMapper {
+
+    private final PasswordEncoder passwordEncoder;
 
     public void mergeUserInfo(User user, UpdateProfileRequest request) {
         if (StringUtils.isNotBlank(request.getFirstName())
@@ -24,7 +29,7 @@ public class UserMapper {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .nickname(request.getNickname())
-                .password(request.getPassword())
+                .password(this.passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
                 .isEnabled(true)
                 .isLocked(false)
