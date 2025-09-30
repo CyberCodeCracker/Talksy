@@ -2,7 +2,7 @@ package com.amouri_dev.talksy.core.services;
 
 import com.amouri_dev.talksy.core.Iservices.IUserService;
 import com.amouri_dev.talksy.entities.user.User;
-import com.amouri_dev.talksy.entities.user.UserMapper;
+import com.amouri_dev.talksy.core.mappers.UserMapper;
 import com.amouri_dev.talksy.entities.user.request.UpdatePasswordRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import com.amouri_dev.talksy.exception.BusinessException;

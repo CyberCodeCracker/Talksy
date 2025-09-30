@@ -30,8 +30,8 @@ public class Message extends BaseAuditingEntity {
     @JoinColumn(name = "CHAT_ID")
     private Chat chat;
     @Column(name = "SENDER_ID", nullable = false)
-    private String senderId;
+    private Long senderId;
     @Column(name = "RECEIVER_ID", nullable = false)
-    private String receiverId;
+    private Long receiverId;
 
 }

@@ -1,5 +1,6 @@
-package com.amouri_dev.talksy.entities.user;
+package com.amouri_dev.talksy.core.mappers;
 
+import com.amouri_dev.talksy.entities.user.User;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import lombok.RequiredArgsConstructor;

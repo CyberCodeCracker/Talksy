@@ -36,7 +36,7 @@ public class Chat extends BaseAuditingEntity {
     private List<Message> messages;
 
     @Transient
-    public String getChatName(final String senderId) {
+    public String getChatName(final Long senderId) {
         if (recipient.getId().equals(senderId)) {
             return sender.getFirstName() + " " + sender.getLastName();
         }
@@ -44,7 +44,7 @@ public class Chat extends BaseAuditingEntity {
     }
 
     @Transient
-    public long getUnreadMessagesCount(final String senderId) {
+    public long getUnreadMessagesCount(final Long senderId) {
         return messages.stream()
                 .filter(message -> message.getReceiverId().equals(senderId))
                 .filter(message -> message.getState() == MessageState.SENT)

@@ -8,7 +8,7 @@ import com.amouri_dev.talksy.entities.token.Token;
 import com.amouri_dev.talksy.entities.token.TokenType;
 import com.amouri_dev.talksy.infrastructure.RoleRepository;
 import com.amouri_dev.talksy.entities.user.User;
-import com.amouri_dev.talksy.entities.user.UserMapper;
+import com.amouri_dev.talksy.core.mappers.UserMapper;
 import com.amouri_dev.talksy.entities.user.auth.AuthenticationRequest;
 import com.amouri_dev.talksy.entities.user.auth.AuthenticationResponse;
 import com.amouri_dev.talksy.entities.user.auth.RefreshRequest;
@@ -62,8 +62,8 @@ public class AuthenticationService implements IAuthenticationService {
         );
 
         final User user = (User) authentication.getPrincipal();
-        final String accessToken = this.jwtService.generateAccessToken(user.getUsername());
-        final String refreshToken = this.jwtService.generateRefreshToken(user.getUsername());
+        final String accessToken = this.jwtService.generateAccessToken(user.getEmail());
+        final String refreshToken = this.jwtService.generateRefreshToken(user.getEmail());
         final String tokenType = "Bearer ";
 
         return AuthenticationResponse.builder()
