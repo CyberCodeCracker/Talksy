@@ -3,16 +3,15 @@ package com.amouri_dev.talksy.entities.message;
 import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.common.BaseAuditingEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "MESSAGES")
 public class Message extends BaseAuditingEntity {
 
@@ -32,6 +31,8 @@ public class Message extends BaseAuditingEntity {
     @Column(name = "SENDER_ID", nullable = false)
     private Long senderId;
     @Column(name = "RECEIVER_ID", nullable = false)
-    private Long receiverId;
+    private Long recipientId;
+    @Column(name = "MEDIA_PATH")
+    private String mediaPath;
 
 }
