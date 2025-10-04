@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.controllers;
 
 import com.amouri_dev.talksy.core.services.UserService;
 import com.amouri_dev.talksy.entities.user.User;
+import com.amouri_dev.talksy.entities.user.UserResponse;
 import com.amouri_dev.talksy.entities.user.request.UpdatePasswordRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -61,7 +64,15 @@ public class UserController {
         this.userService.deleteAccount(getUserId(principal));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/get-users")
+    @ResponseStatus(HttpStatus.OK)
+    public List<UserResponse> getUsers(Authentication connectedUser) {
+        return this.userService.getAllUsersExceptSelf(connectedUser);
+    }
+
     private Long getUserId(Authentication principal) {
         return ((User) principal.getPrincipal()).getId();
     }
+
 }

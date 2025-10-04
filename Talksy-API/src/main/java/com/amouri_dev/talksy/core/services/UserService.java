@@ -3,6 +3,7 @@ package com.amouri_dev.talksy.core.services;
 import com.amouri_dev.talksy.core.Iservices.IUserService;
 import com.amouri_dev.talksy.entities.user.User;
 import com.amouri_dev.talksy.core.mappers.UserMapper;
+import com.amouri_dev.talksy.entities.user.UserResponse;
 import com.amouri_dev.talksy.entities.user.request.UpdatePasswordRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import com.amouri_dev.talksy.exception.BusinessException;
@@ -11,11 +12,13 @@ import com.amouri_dev.talksy.infrastructure.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -75,6 +78,15 @@ public class UserService implements IUserService {
         } else {
             throw new EntityNotFoundException("User with ID " + userId + " not found");
         }
+    }
+
+    @Override
+    public List<UserResponse> getAllUsersExceptSelf(Authentication authentication) {
+        return userRepository.findAllUsersExceptSelf(authentication.getName())
+                .stream()
+                .map(user -> mapper.toUserResponse(user))
+                .toList()
+                ;
     }
 
     @Override

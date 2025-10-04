@@ -1,6 +1,7 @@
 package com.amouri_dev.talksy.core.mappers;
 
 import com.amouri_dev.talksy.entities.user.User;
+import com.amouri_dev.talksy.entities.user.UserResponse;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,16 @@ public class UserMapper {
                 .isLocked(false)
                 .isCredentialsExpired(false)
                 .isEmailVerified(false)
+                .build()
+                ;
+    }
+
+    public UserResponse toUserResponse(User user) {
+        return UserResponse.builder()
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .isOnline(user.isUserOnline())
+                .lastSeen(user.getLastSeen())
                 .build()
                 ;
     }

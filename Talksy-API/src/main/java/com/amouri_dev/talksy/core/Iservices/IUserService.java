@@ -1,8 +1,12 @@
 package com.amouri_dev.talksy.core.Iservices;
 
+import com.amouri_dev.talksy.entities.user.UserResponse;
 import com.amouri_dev.talksy.entities.user.request.UpdatePasswordRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
+import java.util.List;
 
 public interface IUserService extends UserDetailsService {
 
@@ -15,4 +19,5 @@ public interface IUserService extends UserDetailsService {
     void reactivateAccount(Long userId);
 
     void deleteAccount(Long userId);
+    List<UserResponse> getAllUsersExceptSelf(Authentication authentication);
 }
