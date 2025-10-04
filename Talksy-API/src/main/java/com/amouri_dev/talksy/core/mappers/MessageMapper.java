@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.core.mappers;
 
 import com.amouri_dev.talksy.entities.message.Message;
 import com.amouri_dev.talksy.entities.message.MessageResponse;
+import com.amouri_dev.talksy.utils.FileUtils;
 import lombok.*;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class MessageMapper {
                 .recipientId(msg.getRecipientId())
                 .senderId(msg.getSenderId())
                 .message(msg.getContent())
+                .media(FileUtils.readFileFromLocation(msg.getMediaPath()))
                 .build()
                 ;
     }

@@ -1,4 +1,4 @@
-package com.amouri_dev.talksy.security;
+package com.amouri_dev.talksy.utils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;

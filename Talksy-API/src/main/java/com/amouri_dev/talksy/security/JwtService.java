@@ -1,5 +1,6 @@
 package com.amouri_dev.talksy.security;
 
+import com.amouri_dev.talksy.utils.KeyUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
