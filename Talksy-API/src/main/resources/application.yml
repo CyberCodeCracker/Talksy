@@ -28,6 +28,9 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
 
 app:
   security:
@@ -39,6 +42,9 @@ app:
   mail:
     from-email: souhailamouri123@gmail.com
     frontend:
-      activation-url: http://localhost:4200/activate-account
+      activation-url: http://localhost:4200/activate-account*
+  file:
+    uploads:
+      media-output-path: ./uploads
 
 
