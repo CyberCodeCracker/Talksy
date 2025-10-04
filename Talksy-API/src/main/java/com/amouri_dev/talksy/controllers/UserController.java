@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/update-profile")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void udpateProfileInfo(
@@ -28,6 +30,7 @@ public class UserController {
         this.userService.updateProfileInfo(getUserId(principal), request);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/update-password")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void updatedPassword(
@@ -37,18 +40,21 @@ public class UserController {
         this.userService.changePassword(getUserId(principal), request);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/deactivate")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deactivate(final Authentication principal) {
         this.userService.deactivateAccount(getUserId(principal));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/reactivate")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void reactivate(final Authentication principal) {
         this.userService.reactivateAccount(getUserId(principal));
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/me/delete")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(final Authentication principal) {

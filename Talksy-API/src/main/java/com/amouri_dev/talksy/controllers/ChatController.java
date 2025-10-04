@@ -6,6 +6,7 @@ import com.amouri_dev.talksy.entities.chat.ChatResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ public class ChatController {
 
     private final IChatService chatService;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/create-chat")
     @ResponseStatus(value = HttpStatus.CREATED)
     public Long createChat(
@@ -28,6 +30,7 @@ public class ChatController {
        return this.chatService.createChat(senderId, recipientId);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/get-chats")
     @ResponseStatus(value = HttpStatus.OK)
     public List<ChatResponse> getAllChatsByRecipientId(Authentication authentication) {

@@ -79,7 +79,7 @@ public class MessageService implements IMessageService {
     }
 
     @Override
-    public void editMessage(Long messageId, Authentication auth, MessageUpdateRequest request) {
+    public void editMessage(Long messageId, Long chatId, Authentication auth, MessageUpdateRequest request) {
         Message message = this.getMessageById(messageId);
         message.setContent(request.getContent());
         this.messageRepository.save(message);

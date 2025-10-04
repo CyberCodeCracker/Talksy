@@ -14,6 +14,6 @@ public interface IMessageService {
     List<MessageResponse> getAllMessages(Long chatId);
     void setMessagesToSeen(Long chatId, Authentication auth);
     void uploadMediaMessage(Long chatId, MultipartFile file, Authentication auth);
-    void editMessage(Long messageId, Authentication auth, MessageUpdateRequest request);
+    void editMessage(Long messageId, Long chatId, Authentication auth, MessageUpdateRequest request);
     void deleteMessage(Long messageId, Authentication auth);
 }
