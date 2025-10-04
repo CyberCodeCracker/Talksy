@@ -78,6 +78,22 @@ public class MessageService implements IMessageService {
         messageRepository.save(message);
     }
 
+    @Override
+    public void editMessage(Long messageId, Authentication auth, MessageUpdateRequest request) {
+        Message message = this.getMessageById(messageId);
+        message.setContent(request.getContent());
+        this.messageRepository.save(message);
+    }
+
+
+    @Override
+    public void deleteMessage(Long messageId, Authentication auth) {
+        Message message = this.getMessageById(messageId);
+        Chat chat = message.getChat();
+        chat.getMessages().remove(message);
+        this.messageRepository.deleteById(messageId);
+    }
+
     private Long getSenderId(Chat chat, Authentication auth) {
         if (chat.getSender().equals(auth.getName())) {
             return chat.getSender().getId();
@@ -91,6 +107,11 @@ public class MessageService implements IMessageService {
             return chat.getRecipient().getId();
         }
         return chat.getSender().getId();
+    }
+
+    private Message getMessageById(Long messageId) {
+        return this.messageRepository.findById(messageId)
+                .orElseThrow(() -> new EntityNotFoundException("Message not found"));
     }
 
     private Chat getChatById(Long chatId) {

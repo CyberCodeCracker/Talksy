@@ -1,7 +1,6 @@
 package com.amouri_dev.talksy.core.mappers;
 
 import com.amouri_dev.talksy.entities.message.Message;
-import com.amouri_dev.talksy.entities.message.MessageRequest;
 import com.amouri_dev.talksy.entities.message.MessageResponse;
 import lombok.*;
 import org.springframework.stereotype.Service;
@@ -12,15 +11,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class MessageMapper {
-
-
-    public Message toMessage(MessageRequest request) {
-
-
-        return Message.builder()
-                .chat(request.getChatId())
-                .build();
-    }
 
     public MessageResponse toMessageResponse(Message msg) {
         return MessageResponse.builder()
