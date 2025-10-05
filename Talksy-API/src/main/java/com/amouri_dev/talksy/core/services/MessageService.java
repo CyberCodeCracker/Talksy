@@ -2,11 +2,15 @@ package com.amouri_dev.talksy.core.services;
 
 import com.amouri_dev.talksy.core.Iservices.IFileService;
 import com.amouri_dev.talksy.core.Iservices.IMessageService;
+import com.amouri_dev.talksy.core.Iservices.INotificationService;
 import com.amouri_dev.talksy.core.mappers.MessageMapper;
 import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.entities.message.*;
+import com.amouri_dev.talksy.entities.notification.Notification;
+import com.amouri_dev.talksy.entities.notification.NotificationType;
 import com.amouri_dev.talksy.infrastructure.ChatRepository;
 import com.amouri_dev.talksy.infrastructure.MessageRepository;
+import com.amouri_dev.talksy.utils.FileUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -24,6 +28,7 @@ public class MessageService implements IMessageService {
     private final ChatRepository chatRepository;
     private final MessageMapper mapper;
     private final IFileService fileService;
+    private final INotificationService notificationService;
 
     @Override
     @Transactional
@@ -36,8 +41,19 @@ public class MessageService implements IMessageService {
         message.setSenderId(request.getSenderId());
         message.setRecipientId(request.getReceiverId());
         message.setType(request.getMessageType());
-
         messageRepository.save(message);
+
+        Notification notification = Notification.builder()
+                .content(request.getContent())
+                .messageType(request.getMessageType())
+                .chatId(request.getChatId())
+                .senderId(request.getSenderId())
+                .recipientId(request.getReceiverId())
+                .type(NotificationType.MESSAGE)
+                .chatName(chat.getChatName(message.getSenderId()))
+                .build()
+                ;
+        notificationService.sendNotification(message.getRecipientId(), notification);
     }
 
     @Override
@@ -57,6 +73,14 @@ public class MessageService implements IMessageService {
         final Long recipientId = getRecipientId(chat, auth);
 
         messageRepository.setMessagesToSeenByChatId(chatId, MessageState.SEEN);
+        Notification notification = Notification.builder()
+                .chatId(chatId)
+                .senderId(getSenderId(chat, auth))
+                .recipientId(recipientId)
+                .type(NotificationType.SEEN)
+                .build()
+                ;
+        notificationService.sendNotification(recipientId, notification);
     }
 
     @Override
@@ -76,6 +100,16 @@ public class MessageService implements IMessageService {
         message.setMediaPath(filePath);
 
         messageRepository.save(message);
+        Notification notification = Notification.builder()
+                .chatId(chat.getId())
+                .messageType(MessageType.IMAGE)
+                .type(NotificationType.IMAGE)
+                .senderId(senderId)
+                .recipientId(recipientId)
+                .media(FileUtils.readFileFromLocation(filePath))
+                .build()
+                ;
+        notificationService.sendNotification(recipientId, notification);
     }
 
     @Override
@@ -95,7 +129,7 @@ public class MessageService implements IMessageService {
     }
 
     private Long getSenderId(Chat chat, Authentication auth) {
-        if (chat.getSender().equals(auth.getName())) {
+        if (chat.getSender().getEmail().equals(auth.getName())) {
             return chat.getSender().getId();
         }
         return chat.getRecipient().getId();
@@ -103,7 +137,7 @@ public class MessageService implements IMessageService {
 
 
     private Long getRecipientId(Chat chat, Authentication auth) {
-        if (chat.getSender().equals(auth.getName())) {
+        if (chat.getSender().getEmail().equals(auth.getName())) {
             return chat.getRecipient().getId();
         }
         return chat.getSender().getId();
