@@ -18,7 +18,7 @@ import java.util.Optional;
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 @EnableAsync
 @SecurityScheme(
-		name = "AES",
+		name = "BearerAuth",
 		type = SecuritySchemeType.HTTP,
 		bearerFormat = "JWT",
 		scheme = "bearer",
