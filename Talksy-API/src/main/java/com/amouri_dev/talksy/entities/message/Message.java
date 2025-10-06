@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
+@SuperBuilder
 @Table(name = "MESSAGES")
 public class Message extends BaseAuditingEntity {
 

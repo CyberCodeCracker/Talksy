@@ -4,6 +4,7 @@ import com.amouri_dev.talksy.core.Iservices.IMessageService;
 import com.amouri_dev.talksy.entities.message.MessageRequest;
 import com.amouri_dev.talksy.entities.message.MessageResponse;
 import com.amouri_dev.talksy.entities.message.MessageUpdateRequest;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class MessageController {
     @ResponseStatus(HttpStatus.CREATED)
     public void uploadMedia(
             @RequestParam("chat-id") Long chatId,
+            @Parameter()
             @RequestParam("file") MultipartFile file,
             Authentication authentication
     ) {

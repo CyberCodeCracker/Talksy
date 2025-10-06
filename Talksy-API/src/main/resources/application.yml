@@ -32,6 +32,7 @@ spring:
     multipart:
       max-file-size: 50MB
 
+
 app:
   security:
     jwt:
@@ -47,4 +48,6 @@ app:
     uploads:
       media-output-path: ./uploads
 
+springdoc:
+  default-produces-media-type: application/json
 

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @RequiredArgsConstructor
 @Service
 public class MessageMapper {
