@@ -1,4 +1,4 @@
-<div class="d-flex flex-column align-items-center justify-content-center">
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100">
   <img src="/assets/images/logo.jpg" alt="Talksy Logo" class="app-logo" />
   <div class="container-fluid card register-container">
     <h3 class="text-center text-dark mt-5">Register</h3>
@@ -11,7 +11,9 @@
     </div>
     }
     <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <div class="param-group-container d-flex justify-content-around align-items-center">
+      <div
+        class="param-group-container d-flex justify-content-around align-items-center"
+      >
         <div class="param-group d-flex flex-column gap-3">
           <div class="form-group">
             <label class="form-label" for="firstName">First Name</label>
@@ -82,7 +84,7 @@
           type="button"
           class="d-flex justify-content-center align-items-center gap-1 btn-primary"
         >
-          <em class="fas fa-sign-in-alt"></em>
+          <em class="fa fa-user-plus"></em>
           &nbsp;Register
         </button>
         <div class="d-flex align-items-center justify-content-center gap-2">
@@ -92,7 +94,8 @@
             id="register"
             class="btn-secondary d-flex align-items-center justify-content-center"
           >
-            <em class="fa fa-user-plus"></em>
+            <em class="fas fa-sign-in-alt"></em>
+
             &nbsp;Login
           </a>
         </div>
