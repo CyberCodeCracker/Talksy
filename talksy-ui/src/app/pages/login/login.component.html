@@ -1,0 +1,55 @@
+<div class="d-flex flex-column align-items-center justify-content-center min-vh-100">
+  <img src="/assets/images/logo.jpg" alt="Talksy Logo" class="app-logo" />
+  <div class="container-fluid card login-container">
+    <h3 class="text-center text-dark">Login</h3>
+    <hr />
+    @if (errorMsgs.length) {
+    <div class="alert alert-danger" role="alert">
+      @for (errorMsg of errorMsgs; track errorMsg) {
+      <p class="text-danger">{{ errorMsg }}</p>
+      }
+    </div>
+    }
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label class="form-label" for="email">Email Address</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          formControlName="email"
+          placeholder="name@example.com"
+        />
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          formControlName="password"
+        />
+      </div>
+      <div class="d-flex justify-content-between mb-3">
+        <button
+          type="button"
+          class="d-flex justify-content-center align-items-center gap-1 btn-primary"
+        >
+          <em class="fas fa-sign-in-alt"></em>
+          &nbsp;Login
+        </button>
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          Don't have an account ?
+          <a
+            routerLink="/register"
+            id="register"
+            class="btn-secondary d-flex align-items-center justify-content-center"
+          >
+            <em class="fa fa-user-plus"></em>
+            &nbsp;Register
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
