@@ -1,3 +1,14 @@
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
 .login-container {
   height: 60vh;
   display: flex;
@@ -8,6 +19,8 @@
   background-color: #f8f9fa; 
   border-radius: 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  animation: slideInFromLeft 0.5s ease-out both;
 }
 
 form {

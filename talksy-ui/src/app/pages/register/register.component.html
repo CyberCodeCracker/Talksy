@@ -1,1 +1,102 @@
-<p>register works!</p>
+<div class="d-flex flex-column align-items-center justify-content-center">
+  <img src="/assets/images/logo.jpg" alt="Talksy Logo" class="app-logo" />
+  <div class="container-fluid card register-container">
+    <h3 class="text-center text-dark mt-5">Register</h3>
+    <hr />
+    @if (errorMsgs.length) {
+    <div class="alert alert-danger" role="alert">
+      @for (errorMsg of errorMsgs; track errorMsg) {
+      <p class="text-danger">{{ errorMsg }}</p>
+      }
+    </div>
+    }
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <div class="param-group-container d-flex justify-content-around align-items-center">
+        <div class="param-group d-flex flex-column gap-3">
+          <div class="form-group">
+            <label class="form-label" for="firstName">First Name</label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-control"
+              formControlName="firstName"
+              placeholder="Souhail"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="lastName">Last Name</label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-control"
+              formControlName="lastName"
+              placeholder="Amouri"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="nickname">Nickname</label>
+            <input
+              type="text"
+              id="nickname"
+              class="form-control"
+              formControlName="nickname"
+              placeholder="CoolName"
+            />
+          </div>
+        </div>
+
+        <div class="param-group d-flex flex-column gap-3">
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              formControlName="email"
+              placeholder="name@example.com"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              class="form-control"
+              formControlName="password"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="password">Confirm Password</label>
+            <input
+              type="password"
+              id="confirmPassword"
+              class="form-control"
+              formControlName="confirmPassword"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mb-3 mt-3">
+        <button
+          type="button"
+          class="d-flex justify-content-center align-items-center gap-1 btn-primary"
+        >
+          <em class="fas fa-sign-in-alt"></em>
+          &nbsp;Register
+        </button>
+        <div class="d-flex align-items-center justify-content-center gap-2">
+          Already have an account ?
+          <a
+            routerLink=""
+            id="register"
+            class="btn-secondary d-flex align-items-center justify-content-center"
+          >
+            <em class="fa fa-user-plus"></em>
+            &nbsp;Login
+          </a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

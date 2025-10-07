@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthenticationRequest } from '../../services/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +18,7 @@ export class LoginComponent {
     email: new FormControl(''),
     password: new FormControl(''),
   })
+  router = inject(Router);
 
   addError(error: string) {
     this.errorMsgs.push(error);  
@@ -26,6 +27,11 @@ export class LoginComponent {
   onSubmit() {
 
   }
+
+  navigateToRegister() {
+    this.router.navigate(['/register']);
+  }
+
 
 }
 
