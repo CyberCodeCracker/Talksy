@@ -16,15 +16,16 @@ $light-blue: #cee8fc;
 
 body {
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: linear-gradient(to right, $light-gray, $light-blue);
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; // keep horizontal centering
+  align-items: flex-start; // anchor content to top so growth is downward
+  padding-top: 20px; // spacing from viewport top
 }
 
 .app-logo {

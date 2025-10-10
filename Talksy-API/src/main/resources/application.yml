@@ -28,6 +28,8 @@ spring:
           auth: true
           starttls:
             enable: true
+  cors:
+    origins: http://localhost:4200,http://localhost:8080
   servlet:
     multipart:
       max-file-size: 50MB

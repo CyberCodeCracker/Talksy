@@ -2,15 +2,16 @@ import { Component, inject } from '@angular/core';
 import { AuthenticationRequest } from '../../services/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { register } from '../../services/functions';
 import { AuthenticationService } from '../../services/services';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
+  providers: [AuthenticationService, HttpClient]
 })
 export class LoginComponent {
 
@@ -31,12 +32,12 @@ export class LoginComponent {
     this.errorMsgs = [];
     this.authRequest.email = this.loginForm.value.email ?? '';
     this.authRequest.password = this.loginForm.value.password ?? '';
-    this.authService.register({
+    this.authService.login({
       body: this.authRequest
     }).subscribe({
       next: (response) => {
-        localStorage.setItem('authToken', response.token ?? '');
-        this.router.navigate(['/home']);
+        localStorage.setItem('authToken', response.access_token ?? '');
+        this.router.navigate(['home']);
       },
       error: (err) => {
         if (err.status === 401) {
@@ -47,11 +48,6 @@ export class LoginComponent {
       }
     });
   }
-
-  navigateToRegister() {
-    this.router.navigate(['/register']);
-  }
-
 
 }
 

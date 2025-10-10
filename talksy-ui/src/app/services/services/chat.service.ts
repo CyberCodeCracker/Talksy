@@ -3,7 +3,8 @@
 
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
@@ -34,9 +35,9 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  createChat$Response(params: CreateChat$Params, context?: HttpContext): Promise<StrictHttpResponse<number>> {
+  createChat$Response(params: CreateChat$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
     const obs = createChat(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -45,9 +46,11 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  createChat(params: CreateChat$Params, context?: HttpContext): Promise<number> {
+  createChat(params: CreateChat$Params, context?: HttpContext): Observable<number> {
     const resp = this.createChat$Response(params, context);
-    return resp.then((r: StrictHttpResponse<number>): number => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<number>): number => r.body)
+    );
   }
 
   /** Path part for operation `getAllChatsByRecipientId()` */
@@ -59,9 +62,9 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllChatsByRecipientId$Response(params?: GetAllChatsByRecipientId$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<ChatResponse>>> {
+  getAllChatsByRecipientId$Response(params?: GetAllChatsByRecipientId$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<ChatResponse>>> {
     const obs = getAllChatsByRecipientId(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -70,9 +73,11 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getAllChatsByRecipientId(params?: GetAllChatsByRecipientId$Params, context?: HttpContext): Promise<Array<ChatResponse>> {
+  getAllChatsByRecipientId(params?: GetAllChatsByRecipientId$Params, context?: HttpContext): Observable<Array<ChatResponse>> {
     const resp = this.getAllChatsByRecipientId$Response(params, context);
-    return resp.then((r: StrictHttpResponse<Array<ChatResponse>>): Array<ChatResponse> => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<Array<ChatResponse>>): Array<ChatResponse> => r.body)
+    );
   }
 
 }

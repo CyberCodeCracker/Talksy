@@ -3,7 +3,8 @@
 
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
@@ -40,9 +41,9 @@ export class MessageService extends BaseService {
    *
    * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  uploadMedia$Response(params: UploadMedia$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  uploadMedia$Response(params: UploadMedia$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = uploadMedia(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -51,9 +52,11 @@ export class MessageService extends BaseService {
    *
    * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  uploadMedia(params: UploadMedia$Params, context?: HttpContext): Promise<void> {
+  uploadMedia(params: UploadMedia$Params, context?: HttpContext): Observable<void> {
     const resp = this.uploadMedia$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `saveMessage()` */
@@ -65,9 +68,9 @@ export class MessageService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  saveMessage$Response(params: SaveMessage$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  saveMessage$Response(params: SaveMessage$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = saveMessage(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -76,9 +79,11 @@ export class MessageService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  saveMessage(params: SaveMessage$Params, context?: HttpContext): Promise<void> {
+  saveMessage(params: SaveMessage$Params, context?: HttpContext): Observable<void> {
     const resp = this.saveMessage$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `setMessagesToSeen()` */
@@ -90,9 +95,9 @@ export class MessageService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  setMessagesToSeen$Response(params: SetMessagesToSeen$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  setMessagesToSeen$Response(params: SetMessagesToSeen$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = setMessagesToSeen(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -101,9 +106,11 @@ export class MessageService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  setMessagesToSeen(params: SetMessagesToSeen$Params, context?: HttpContext): Promise<void> {
+  setMessagesToSeen(params: SetMessagesToSeen$Params, context?: HttpContext): Observable<void> {
     const resp = this.setMessagesToSeen$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `editMessage()` */
@@ -115,9 +122,9 @@ export class MessageService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  editMessage$Response(params: EditMessage$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  editMessage$Response(params: EditMessage$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = editMessage(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -126,9 +133,11 @@ export class MessageService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  editMessage(params: EditMessage$Params, context?: HttpContext): Promise<void> {
+  editMessage(params: EditMessage$Params, context?: HttpContext): Observable<void> {
     const resp = this.editMessage$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `getMessages()` */
@@ -140,9 +149,9 @@ export class MessageService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getMessages$Response(params: GetMessages$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<MessageResponse>>> {
+  getMessages$Response(params: GetMessages$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<MessageResponse>>> {
     const obs = getMessages(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -151,9 +160,11 @@ export class MessageService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getMessages(params: GetMessages$Params, context?: HttpContext): Promise<Array<MessageResponse>> {
+  getMessages(params: GetMessages$Params, context?: HttpContext): Observable<Array<MessageResponse>> {
     const resp = this.getMessages$Response(params, context);
-    return resp.then((r: StrictHttpResponse<Array<MessageResponse>>): Array<MessageResponse> => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<Array<MessageResponse>>): Array<MessageResponse> => r.body)
+    );
   }
 
 }

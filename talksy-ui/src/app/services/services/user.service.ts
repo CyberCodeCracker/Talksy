@@ -3,7 +3,8 @@
 
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
@@ -42,9 +43,9 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  udpateProfileInfo$Response(params: UdpateProfileInfo$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  udpateProfileInfo$Response(params: UdpateProfileInfo$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = udpateProfileInfo(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -53,9 +54,11 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  udpateProfileInfo(params: UdpateProfileInfo$Params, context?: HttpContext): Promise<void> {
+  udpateProfileInfo(params: UdpateProfileInfo$Params, context?: HttpContext): Observable<void> {
     const resp = this.udpateProfileInfo$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `updatedPassword()` */
@@ -67,9 +70,9 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updatedPassword$Response(params: UpdatedPassword$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  updatedPassword$Response(params: UpdatedPassword$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = updatedPassword(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -78,9 +81,11 @@ export class UserService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  updatedPassword(params: UpdatedPassword$Params, context?: HttpContext): Promise<void> {
+  updatedPassword(params: UpdatedPassword$Params, context?: HttpContext): Observable<void> {
     const resp = this.updatedPassword$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `reactivate()` */
@@ -92,9 +97,9 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  reactivate$Response(params?: Reactivate$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  reactivate$Response(params?: Reactivate$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = reactivate(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -103,9 +108,11 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  reactivate(params?: Reactivate$Params, context?: HttpContext): Promise<void> {
+  reactivate(params?: Reactivate$Params, context?: HttpContext): Observable<void> {
     const resp = this.reactivate$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `deactivate()` */
@@ -117,9 +124,9 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  deactivate$Response(params?: Deactivate$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  deactivate$Response(params?: Deactivate$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = deactivate(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -128,9 +135,11 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  deactivate(params?: Deactivate$Params, context?: HttpContext): Promise<void> {
+  deactivate(params?: Deactivate$Params, context?: HttpContext): Observable<void> {
     const resp = this.deactivate$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `getUsers()` */
@@ -142,9 +151,9 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUsers$Response(params?: GetUsers$Params, context?: HttpContext): Promise<StrictHttpResponse<Array<UserResponse>>> {
+  getUsers$Response(params?: GetUsers$Params, context?: HttpContext): Observable<StrictHttpResponse<Array<UserResponse>>> {
     const obs = getUsers(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -153,9 +162,11 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  getUsers(params?: GetUsers$Params, context?: HttpContext): Promise<Array<UserResponse>> {
+  getUsers(params?: GetUsers$Params, context?: HttpContext): Observable<Array<UserResponse>> {
     const resp = this.getUsers$Response(params, context);
-    return resp.then((r: StrictHttpResponse<Array<UserResponse>>): Array<UserResponse> => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<Array<UserResponse>>): Array<UserResponse> => r.body)
+    );
   }
 
   /** Path part for operation `delete()` */
@@ -167,9 +178,9 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  delete$Response(params?: Delete$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  delete$Response(params?: Delete$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = delete$(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -178,9 +189,11 @@ export class UserService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  delete(params?: Delete$Params, context?: HttpContext): Promise<void> {
+  delete(params?: Delete$Params, context?: HttpContext): Observable<void> {
     const resp = this.delete$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
 }

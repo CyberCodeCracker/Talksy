@@ -3,7 +3,8 @@
 
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { BaseService } from '../base-service';
 import { ApiConfiguration } from '../api-configuration';
@@ -36,9 +37,9 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  register$Response(params: Register$Params, context?: HttpContext): Promise<StrictHttpResponse<void>> {
+  register$Response(params: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = register(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -47,9 +48,11 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  register(params: Register$Params, context?: HttpContext): Promise<void> {
+  register(params: Register$Params, context?: HttpContext): Observable<void> {
     const resp = this.register$Response(params, context);
-    return resp.then((r: StrictHttpResponse<void>): void => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `refresh()` */
@@ -61,9 +64,9 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  refresh$Response(params: Refresh$Params, context?: HttpContext): Promise<StrictHttpResponse<AuthenticationResponse>> {
+  refresh$Response(params: Refresh$Params, context?: HttpContext): Observable<StrictHttpResponse<AuthenticationResponse>> {
     const obs = refresh(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -72,9 +75,11 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  refresh(params: Refresh$Params, context?: HttpContext): Promise<AuthenticationResponse> {
+  refresh(params: Refresh$Params, context?: HttpContext): Observable<AuthenticationResponse> {
     const resp = this.refresh$Response(params, context);
-    return resp.then((r: StrictHttpResponse<AuthenticationResponse>): AuthenticationResponse => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<AuthenticationResponse>): AuthenticationResponse => r.body)
+    );
   }
 
   /** Path part for operation `login()` */
@@ -86,9 +91,9 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  login$Response(params: Login$Params, context?: HttpContext): Promise<StrictHttpResponse<AuthenticationResponse>> {
+  login$Response(params: Login$Params, context?: HttpContext): Observable<StrictHttpResponse<AuthenticationResponse>> {
     const obs = login(this.http, this.rootUrl, params, context);
-    return firstValueFrom(obs);
+    return obs;
   }
 
   /**
@@ -97,9 +102,11 @@ export class AuthenticationService extends BaseService {
    *
    * This method sends `application/json` and handles request body of type `application/json`.
    */
-  login(params: Login$Params, context?: HttpContext): Promise<AuthenticationResponse> {
+  login(params: Login$Params, context?: HttpContext): Observable<AuthenticationResponse> {
     const resp = this.login$Response(params, context);
-    return resp.then((r: StrictHttpResponse<AuthenticationResponse>): AuthenticationResponse => r.body);
+    return resp.pipe(
+      map((r: StrictHttpResponse<AuthenticationResponse>): AuthenticationResponse => r.body)
+    );
   }
 
 }

@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "api-gen": "ng-openapi-gen -i ./src/openapi/openapi.json -o ./src/app/services --services true"
+    "api-gen": "ng-openapi-gen -i ./src/openapi/openapi.json -o ./src/app/services --services true --promises false"
   },
   "private": true,
   "dependencies": {
