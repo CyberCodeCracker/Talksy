@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,6 +97,28 @@ public class AuthenticationService implements IAuthenticationService {
 
         this.roleRepository.save(userRole);
         sendValidationEmail(user);
+    }
+
+    @Transactional
+    public void confirmAccount(String token) throws MessagingException {
+        Token savedToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_TOKEN));
+        if (LocalDateTime.now().isAfter(savedToken.getExpiresAt())) {
+            sendValidationEmail(savedToken.getUser());
+            throw new RuntimeException("Activation token expired. A new token has been issued.");
+        }
+        try {
+            User user = userRepository.findById(savedToken.getUser().getId())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+            if (savedToken.getToken().equals(token)) {
+                user.setEnabled(true);
+                userRepository.save(user);
+                savedToken.setValidatedAt(LocalDateTime.now());
+                tokenRepository.save(savedToken);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     private void sendValidationEmail(User user) throws MessagingException {

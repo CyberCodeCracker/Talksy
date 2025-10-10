@@ -42,4 +42,14 @@ public class AuthenticationController {
         return ResponseEntity.ok(this.authenticationService.refreshToken(request));
     }
 
+    @GetMapping("/confirm-account")
+    @ResponseStatus(code = HttpStatus.OK)
+    public void confirmAccount(
+        @RequestParam final String token
+    ) throws MessagingException {
+        this.authenticationService.confirmAccount(token);
+    }
+
+
+
 }

@@ -102,4 +102,7 @@
       </div>
     </form>
   </div>
+  @if (showConfirmAccountModal) {
+    <app-confirm-account (close)="closeConfirmModal()"></app-confirm-account>
+  }
 </div>

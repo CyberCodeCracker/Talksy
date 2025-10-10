@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private static final String[] PUBLIC_URLS = {
-            "/api/v1/auth/refresh",
+            "/api/v1/auth/confirm-account",
             "/api/v1/auth/register",
             "/api/v1/auth/login",
             "/v2/api-docs",

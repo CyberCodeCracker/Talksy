@@ -21,6 +21,8 @@ export type { Refresh$Params } from './fn/authentication/refresh';
 export { refresh } from './fn/authentication/refresh';
 export type { Login$Params } from './fn/authentication/login';
 export { login } from './fn/authentication/login';
+export type { ConfirmAccount$Params } from './fn/authentication/confirm-account';
+export { confirmAccount } from './fn/authentication/confirm-account';
 export type { UdpateProfileInfo$Params } from './fn/user/udpate-profile-info';
 export { udpateProfileInfo } from './fn/user/udpate-profile-info';
 export type { UpdatedPassword$Params } from './fn/user/updated-password';

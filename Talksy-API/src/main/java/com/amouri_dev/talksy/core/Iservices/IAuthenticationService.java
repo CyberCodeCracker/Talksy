@@ -10,4 +10,5 @@ public interface IAuthenticationService {
     AuthenticationResponse login(AuthenticationRequest request);
     void register(RegistrationRequest request) throws MessagingException;
     AuthenticationResponse refreshToken(RefreshRequest request);
+    void confirmAccount(String token) throws MessagingException;
 }

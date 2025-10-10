@@ -1,23 +1,22 @@
 import { Component, inject } from '@angular/core';
 import {
-  AuthenticationRequest,
-  RegistrationRequest,
+  RegistrationRequest
 } from '../../services/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
+import { ConfirmAccountComponent } from '../../components/confirm-account/confirm-account.component';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, ConfirmAccountComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent {
 
-  authService = inject(AuthenticationService);
-  router = inject(Router);
-
+  private authService = inject(AuthenticationService);
+  private router = inject(Router);
 
   registerRequest: RegistrationRequest = {
     email: '',
@@ -37,6 +36,7 @@ export class RegisterComponent {
   })
 
   errorMsgs: Array<string> = [];
+  showConfirmAccountModal: boolean = false;
 
   addError(error: string) {
     this.errorMsgs.push(error);  
@@ -57,14 +57,21 @@ export class RegisterComponent {
       body: this.registerRequest
     }).subscribe({
       next: (res) => {
-        console.log(res);
-        
+        this.showConfirmAccountModal = true;
       },
       error: (err) => {
-
+        if (err.error?.validationErrors) {
+          this.errorMsgs = err.error.validationErrors;
+        } else if (err.error?.error) {
+          this.addError(err.error.error);
+        } else {
+          this.addError('An error occurred during registration. Please try again.');
+        }
       }
     })
   }
 
-
+  closeConfirmModal() {
+    this.showConfirmAccountModal = false;
+  }
 }

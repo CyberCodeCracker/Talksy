@@ -16,7 +16,9 @@ public enum ErrorCode {
     USER_DISABLED("ACCOUNT_DISABLED", "account disabled", HttpStatus.UNAUTHORIZED ),
     BAD_CREDENTIALS("BAD_CREDENTIALS", "Email and / or password is wrong" , HttpStatus.UNAUTHORIZED ),
     INTERNAL_EXCEPTION("INTERNAL_EXCEPTION", "Internal exception" , HttpStatus.INTERNAL_SERVER_ERROR ),
-    ENTITY_NOT_FOUND("ENTITY_NOT_FOUND", "Entity not found" , HttpStatus.NOT_FOUND ),;
+    ENTITY_NOT_FOUND("ENTITY_NOT_FOUND", "Entity not found" , HttpStatus.NOT_FOUND ),
+    INVALID_TOKEN("INVALID_TOKEN", "Invalid token" , HttpStatus.UNAUTHORIZED ),
+    ;
     private final String code;
     private final String defaultMessage;
     private final HttpStatus httpStatus;

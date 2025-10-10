@@ -20,9 +20,10 @@ export class LoginComponent {
   loginForm = new FormGroup({
     email: new FormControl(''),
     password: new FormControl(''),
-  })
-  router = inject(Router);
-  authService = inject(AuthenticationService);
+  });
+
+  private router = inject(Router);
+  private authService = inject(AuthenticationService);
 
   addError(error: string) {
     this.errorMsgs.push(error);  

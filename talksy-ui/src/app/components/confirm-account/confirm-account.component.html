@@ -1,0 +1,67 @@
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    @if (!submitted) {
+      <div class="modal-header">
+        <h3>Account Activation</h3>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Your account has been successfully created. Please check your email and enter the 6-digit activation code below:</p>
+        @if (errorMsgs.length) {
+          <div class="alert alert-danger" role="alert">
+            @for (errorMsg of errorMsgs; track errorMsg) {
+              <p class="text-danger mb-0">{{ errorMsg }}</p>
+            }
+          </div>
+        }
+        <code-input
+          [isCodeHidden]="false"
+          [codeLength]="6"
+          [code]="'number'"
+          (codeCompleted)="onCodeCompleted($event)"
+        ></code-input>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeModal()">Cancel</button>
+      </div>
+    }
+    @else {
+      @if (isOkay) {
+        <div class="modal-header">
+          <h3>Success!</h3>
+        </div>
+        <div class="modal-body text-center">
+          <div class="success-icon">
+            <em class="fas fa-check-circle"></em>
+          </div>
+          <p>Your account has been successfully activated. You can now log in.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-primary" (click)="navigateToLogin()">Go to Login</button>
+        </div>
+      }
+      @else {
+        <div class="modal-header">
+          <h3>Error</h3>
+        </div>
+        <div class="modal-body text-center">
+          <div class="error-icon">
+            <em class="fas fa-times-circle"></em>
+          </div>
+          <p>{{ message }}</p>
+          @if (errorMsgs.length) {
+            <div class="alert alert-danger" role="alert">
+              @for (errorMsg of errorMsgs; track errorMsg) {
+                <p class="text-danger mb-0">{{ errorMsg }}</p>
+              }
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-secondary" (click)="closeModal()">Close</button>
+          <button class="btn-primary" (click)="navigateToRegister()">Go to Register</button>
+        </div>
+      }
+    }
+  </div>
+</div>
