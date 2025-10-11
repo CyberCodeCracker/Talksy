@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
 import { HttpClient } from '@angular/common/http';
+import { TokenService } from '../../services/token.service';
 
 @Component({
   selector: 'app-login',
@@ -24,6 +25,7 @@ export class LoginComponent {
 
   private router = inject(Router);
   private authService = inject(AuthenticationService);
+  private tokenService = inject(TokenService);
 
   addError(error: string) {
     this.errorMsgs.push(error);  
@@ -37,12 +39,18 @@ export class LoginComponent {
       body: this.authRequest
     }).subscribe({
       next: (response) => {
-        localStorage.setItem('authToken', response.access_token ?? '');
-        this.router.navigate(['home']);
+        if (response.access_token && response.refresh_token) {
+          this.tokenService.setTokens(response.access_token, response.refresh_token);
+          this.router.navigate(['home']);
+        } else {
+          this.addError('Invalid response from server.');
+        }
       },
       error: (err) => {
         if (err.status === 401) {
           this.addError('Invalid email or password.');
+        } else if (err.status === 403) {
+          this.addError('Account not activated. Please check your email.');
         } else {
           this.addError('An error occurred. Please try again later.');
         }
