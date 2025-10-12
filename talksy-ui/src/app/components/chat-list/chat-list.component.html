@@ -1,0 +1,62 @@
+<div class="chat-list mt-3">
+  @if (chats().length && !searchNewContact) { @for (chat of chats(); track chat)
+  {
+  <div
+    class="d-flex align-items-center justify-content-between border-bottom-gray p-2"
+    (click)="chatClicked(chat)"
+  >
+    <div class="d-flex gap-2">
+      <div class="user-img">
+        <img
+          src="/assets/images/user.png"
+          alt="Profile picture for {{ chat.name }}"
+        />
+      </div>
+      <div class="d-flex flex-column">
+        <span>{{ chat.name }}</span>
+        <small class="text-secondary">
+          @if (chat.lastMessage === 'Attachment') {
+          <i class="fas fa-image"></i>
+          }
+          {{ wrapMessage(chat.lastMessage) }}
+        </small>
+      </div>
+    </div>
+    <div class="d-flex flex-column align-items-end">
+      <span
+        class="msg-date"
+        [class.unread]="chat.unreadChatsCount && chat.unreadChatsCount > 0"
+      >
+        {{ chat.lastMessageTime | date : "dd.MM.yy HH:mm" }}
+      </span>
+      @if(chat.unreadChatsCount && chat.unreadChatsCount > 0) {
+      <small class="unread-msg-badge"></small>
+      }
+    </div>
+  </div>
+  } } @else if (searchNewContact()) { @for (contact of contacts; track contact)
+  {
+  <div
+    class="d-flex align-items-center justify-content-between border-bottom-gray p-2"
+    (click)="selectContact(contact)"
+  >
+    <div class="d-flex gap-2">
+      <div class="user-img">
+        <img src="/assets/images/user.png" alt="" />
+      </div>
+      <div class="d-flex flex-column">
+        <span>{{ contact.firstName + "" + contact.lastName }}</span>
+        @if (contact.online) {
+        <small class="text-secondary">Online</small>
+        } @else {
+        <small class="text-secondary"
+          >Last seen &nbsp; {{ contact.lastSeen | date: 'dd.mm.yyyy HH:mm'}}</small
+        >
+        }
+      </div>
+    </div>
+  </div>
+  } } @else{
+    <small>No chat yet...</small>
+  }
+</div>

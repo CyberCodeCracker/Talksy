@@ -1,6 +1,7 @@
 package com.amouri_dev.talksy.core.services;
 
 import com.amouri_dev.talksy.core.Iservices.IUserService;
+import com.amouri_dev.talksy.entities.role.Role;
 import com.amouri_dev.talksy.entities.user.User;
 import com.amouri_dev.talksy.core.mappers.UserMapper;
 import com.amouri_dev.talksy.entities.user.UserResponse;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,8 +93,11 @@ public class UserService implements IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        return this.userRepository.findByEmail(email)
+        User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found."));
+
+        log.info("User Role: {}", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+        return user;
     }
 
     private User findUserById(Long userId) {

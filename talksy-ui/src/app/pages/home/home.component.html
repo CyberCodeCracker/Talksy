@@ -1,1 +1,27 @@
-<p>home works!</p>
+<div class="main">
+  <div class="header"></div>
+  <div class="main-container d-flex">
+    <div
+      class="d-flex flex-column justify-content-between align-items-center p-3 gray-bg"
+    >
+      <div>
+        <i class="fa-solid fa-message"></i>
+      </div>
+      <div class="d-flex flex-column align-items-center gap-2">
+        <i class="fa-solid fa-user cursor-pointer"></i>
+        <i class="fa-solid fa-door-open cursor-pointer"></i>
+      </div>
+    </div>
+    <div class="d-flex w-100">
+      <div class="col-3 overflow-x-scroll d-flex flex-column ">
+        <app-contact-list
+          (searchNewContact)="updateSearchContact($event)"
+        />
+        <app-chat-list 
+          [chats]="chats"
+          [searchNewContact]="searchNewContact()"
+        />
+      </div>
+    </div>
+  </div>
+</div>

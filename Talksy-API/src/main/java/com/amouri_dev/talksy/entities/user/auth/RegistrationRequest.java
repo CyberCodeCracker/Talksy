@@ -2,12 +2,12 @@ package com.amouri_dev.talksy.entities.user.auth;
 
 import com.amouri_dev.talksy.validation.NonDisposableEmail;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
 
 @Getter
 @Setter
@@ -56,5 +56,4 @@ public class RegistrationRequest {
             message = "Minimum eight characters, at least one letter and one number"
     )
     private String password;
-
 }

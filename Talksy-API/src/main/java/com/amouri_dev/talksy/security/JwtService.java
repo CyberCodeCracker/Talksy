@@ -6,34 +6,45 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Date;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
     private static final String TOKEN_TYPE = "token_type";
+    private static final String AUTHORITIES = "authorities";
     private final PrivateKey privateKey;
     private final PublicKey publicKey;
+    private final UserDetailsService userDetailsService;
     @Value("${app.security.jwt.access-token-expiration}")
     private long accessTokenExpiration;
     @Value("${app.security.jwt.refresh-token-expiration}")
     private long refreshTokenExpiration;
 
 
-    public JwtService() throws Exception {
+    public JwtService(UserDetailsService userDetailsService) throws Exception {
+        this.userDetailsService = userDetailsService;
         this.privateKey = KeyUtils.loadPrivateKey("/keys/local-only/private_key.pem");
         this.publicKey = KeyUtils.loadPublicKey("/keys/local-only/public_key.pem");
     }
 
-    public String generateAccessToken(final String username) {
-        final Map<String, Object> claims = Map.of(TOKEN_TYPE, "ACCESS_TOKEN");
-        return buildToken(username, claims, this.accessTokenExpiration);
+    public String generateAccessToken(final UserDetails userDetails) {
+        final Map<String, Object> claims = Map.of(
+                TOKEN_TYPE, "ACCESS_TOKEN",
+                AUTHORITIES, userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .collect(Collectors.toList())
+        );
+        return buildToken(userDetails.getUsername(), claims, this.accessTokenExpiration);
     }
 
     public String generateRefreshToken(final String username) {
@@ -88,7 +99,8 @@ public class JwtService {
             throw new RuntimeException("Refresh token expired");
         }
         final String username = claims.getSubject();
-        return generateAccessToken(username);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return generateAccessToken(userDetails);
     }
 
 }

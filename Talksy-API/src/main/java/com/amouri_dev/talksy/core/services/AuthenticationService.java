@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +47,7 @@ public class AuthenticationService implements IAuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final IEmailService emailService;
+    private final UserDetailsService userDetailsService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final TokenRepository tokenRepository;
@@ -63,8 +66,9 @@ public class AuthenticationService implements IAuthenticationService {
         );
 
         final User user = (User) authentication.getPrincipal();
-        final String accessToken = this.jwtService.generateAccessToken(user.getEmail());
-        final String refreshToken = this.jwtService.generateRefreshToken(user.getEmail());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
+        final String accessToken = this.jwtService.generateAccessToken(userDetails);
+        final String refreshToken = this.jwtService.generateRefreshToken(userDetails.getUsername());
         final String tokenType = "Bearer ";
 
         return AuthenticationResponse.builder()

@@ -55,14 +55,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
               }
               
               // If no tokens in response, clear and redirect
-              tokenService.clearTokens();
-              router.navigate(['/login']);
               return throwError(() => error);
             }),
             catchError((refreshError) => {
               // Refresh failed, clear tokens and redirect to login
-              tokenService.clearTokens();
-              router.navigate(['/login']);
+
               return throwError(() => refreshError);
             })
           );
