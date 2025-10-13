@@ -3,6 +3,8 @@ import { ChatListComponent } from '../../components/chat-list/chat-list.componen
 import { ChatResponse } from '../../services/models';
 import { ChatService } from '../../services/services';
 import { ContactListComponent } from '../../components/contact-list/contact-list.component';
+import { TokenService } from '../../../token.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -14,10 +16,13 @@ export class HomeComponent implements OnInit {
   chats: Array<ChatResponse> = [];
 
   private chatService = inject(ChatService);
+  private tokenService = inject(TokenService);
+  private router = inject(Router);
 
   searchNewContact = signal(false);
 
   updateSearchContact(newValue: boolean) {
+    console.log(newValue);
     this.searchNewContact.set(newValue);
   }
 
@@ -34,5 +39,14 @@ export class HomeComponent implements OnInit {
         console.error('Error loading chats:', err);
       },
     });
+  }
+
+  userProfile() {
+
+  }
+
+  logout() {
+    this.tokenService.clearTokens();
+    this.router.navigate(['login']); 
   }
 }

@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
 import { HttpClient } from '@angular/common/http';
-import { TokenService } from '../../services/token.service';
+import { TokenService } from '../../../token.service';
 
 @Component({
   selector: 'app-login',

@@ -1,4 +1,4 @@
-import { Component, inject, input, InputSignal } from '@angular/core';
+import { Component, inject, input, InputSignal, OnInit } from '@angular/core';
 import { ChatResponse, UserResponse } from '../../services/models';
 import { DatePipe } from '@angular/common';
 import { ChatService, UserService } from '../../services/services';
@@ -9,13 +9,17 @@ import { ChatService, UserService } from '../../services/services';
   templateUrl: './chat-list.component.html',
   styleUrl: './chat-list.component.scss',
 })
-export class ChatListComponent {
+export class ChatListComponent implements OnInit {
   chats: InputSignal<ChatResponse[]> = input<ChatResponse[]>([]);
   searchNewContact = input<boolean>();
   contacts: Array<UserResponse> = [];
 
   private chatService = inject(ChatService);
   private userService = inject(UserService);
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
 
   chatClicked(chat: ChatResponse): void {}
 
@@ -28,5 +32,18 @@ export class ChatListComponent {
       return message;
     }
     return message?.substring(0, 17) + '...';
+  }
+
+  private loadUsers(): void {
+    this.userService.getUsers().subscribe({
+      next: (users: UserResponse[]) => {
+        this.contacts = users || [];
+        console.log("loaded contacts", this.contacts);
+      },
+      error: (err) => {
+        console.log("Error loading contacts ", err);
+        this.contacts = [];
+      }
+    })
   }
 }

@@ -11,14 +11,16 @@ import { ChatService, UserService } from '../../services/services';
 export class ContactListComponent {
   chats: InputSignal<ChatResponse[]> = input<ChatResponse[]>([]);
   searchNewContact = output<boolean>();
+  // Current search state provided by parent (defaults to false)
+  isSearching = input<boolean>(false);
 
-  onSearchContact(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchNewContact.emit(input.checked);
+  onSearchContact(): void {
+    console.log('Contact list on search contact:true');
+    this.searchNewContact.emit(true);
   }
 
-  onExitSearchContact(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchNewContact.emit(input.checked);
+  onExitSearchContact(): void {
+    console.log('Contact list on exit search contact:false');
+    this.searchNewContact.emit(false);
   }
 }

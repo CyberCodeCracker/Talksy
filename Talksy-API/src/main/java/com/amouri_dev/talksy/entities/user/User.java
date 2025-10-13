@@ -103,7 +103,7 @@ public class User extends BaseAuditingEntity implements UserDetails {
 
     @Override
     public String getUsername() {
-        return firstName + lastName;
+        return email;
     }
 
     @Override

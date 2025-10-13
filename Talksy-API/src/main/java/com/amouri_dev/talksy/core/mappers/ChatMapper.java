@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ChatMapper {
     public ChatResponse toChatResponse(Chat chat, Long senderId) {
+        if (chat == null) {
+            return null;
+        }
         return ChatResponse.builder()
                 .id(chat.getId())
                 .name(chat.getChatName(senderId))

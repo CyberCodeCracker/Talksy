@@ -9,15 +9,18 @@ import com.amouri_dev.talksy.infrastructure.ChatRepository;
 import com.amouri_dev.talksy.infrastructure.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ChatService implements IChatService {
 
     private final ChatRepository chatRepository;
@@ -27,13 +30,26 @@ public class ChatService implements IChatService {
     @Override
     @Transactional(readOnly = true)
     public List<ChatResponse> getChatsByRecipientID(Authentication auth) {
-        final User user = ((User) auth.getPrincipal());
-        final Long userId = user.getId();
-        return chatRepository.findChatsBySenderId(user.getId())
-                .stream()
+        String email = auth.getName();
+        log.debug("Fetching chats for user email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found for email: {}", email);
+                    return new EntityNotFoundException("User not found: " + email);
+                });
+        Long userId = user.getId();
+        List<Chat> chats = chatRepository.findChatsBySenderId(userId);
+        log.debug("Found {} chats for user: {}", chats.size(), email);
+
+        // Handle empty chats
+        if (chats == null || chats.isEmpty()) {
+            log.info("No chats found for user: {}", email);
+            return Collections.emptyList();
+        }
+
+        return chats.stream()
                 .map(chat -> mapper.toChatResponse(chat, userId))
-                .toList()
-                ;
+                .toList();
     }
 
     @Override
