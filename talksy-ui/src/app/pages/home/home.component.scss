@@ -1,3 +1,6 @@
+$light-gray: #e9e5e5;
+$light-blue: #cee8fc;
+
 .main {
   display: flex;
   min-height: 100vh !important;
@@ -22,4 +25,123 @@
   height: calc(100vh - 60px);
   background: #fff;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.6);
+}
+
+.online-status {
+  background-color: #1ea885;
+  min-height: 10px;
+  max-height: 10px;
+  min-width: 10px;
+  max-width: 10px;
+  border: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offline-status {
+  background-color: red;
+  min-height: 10px;
+  max-height: 10px;
+  min-width: 10px;
+  max-width: 10px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bg-chat {
+  background: linear-gradient(to right, $light-blue, $light-gray);
+  background-size: contain;
+}
+
+.message-box {
+  position: relative;
+  display: flex;
+  width: 100%;
+  margin: 5px 0;
+
+  &.self {
+    > div {
+      position: relative;
+      right: 0;
+      text-align: right;
+      background: $light-blue;
+      max-width: 65%;
+      padding: 10px 10px 0 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+    justify-content: flex-end;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: -10px;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(
+        135deg,
+        $light-blue 0%,
+        $light-blue 50%,
+        transparent 50%,
+        transparent
+      );
+    }
+  }
+  &.friend {
+    justify-content: flex-start;
+    > div {
+      position: relative;
+      right: 0;
+      text-align: left;
+      background: $light-gray;
+      max-width: 65%;
+      padding: 10px 10px 0 10px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -10px;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(
+        225deg,
+        $light-gray 0%,
+        $light-gray 50%,
+        transparent 50%,
+        transparent
+      );
+    }
+  }
+}
+
+i {
+  &.seen {
+    color: #53bdeb;
+  }
+  &.ml-neg {
+    margin-left: -7px;
+  }
+}
+
+.fa-door-open,
+.fa-user {
+  &:hover {
+    color: blue;
+  }
+}
+
+.emojis-panel {
+  position: absolute;
+  left: 350px;
+  bottom: 50px;
 }

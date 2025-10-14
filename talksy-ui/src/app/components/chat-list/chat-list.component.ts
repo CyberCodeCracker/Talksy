@@ -1,4 +1,4 @@
-import { Component, inject, input, InputSignal, OnInit } from '@angular/core';
+import { Component, inject, input, InputSignal, OnInit, output } from '@angular/core';
 import { ChatResponse, UserResponse } from '../../services/models';
 import { DatePipe } from '@angular/common';
 import { ChatService, UserService } from '../../services/services';
@@ -13,6 +13,7 @@ export class ChatListComponent implements OnInit {
   chats: InputSignal<ChatResponse[]> = input<ChatResponse[]>([]);
   searchNewContact = input<boolean>();
   contacts: Array<UserResponse> = [];
+  chatSelected = output<ChatResponse>();
 
   private chatService = inject(ChatService);
   private userService = inject(UserService);
@@ -21,7 +22,9 @@ export class ChatListComponent implements OnInit {
     this.loadUsers();
   }
 
-  chatClicked(chat: ChatResponse): void {}
+  chatClicked(chat: ChatResponse): void {
+    this.chatSelected.emit(chat);
+  }
 
   selectContact(contact: UserResponse) {
 

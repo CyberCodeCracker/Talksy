@@ -252,6 +252,22 @@
         "responses": { "202": { "description": "Accepted" } }
       }
     },
+    "/api/v1/users/me": {
+      "get": {
+        "tags": ["User"],
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/users/get-users": {
       "get": {
         "tags": ["User"],

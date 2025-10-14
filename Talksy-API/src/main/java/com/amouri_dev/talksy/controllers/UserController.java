@@ -24,6 +24,14 @@ public class UserController {
     private final UserService userService;
 
     @PreAuthorize("hasRole('ROLE_USER')")
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    public UserResponse getCurrentUser(Authentication authentication) {
+        String email = authentication.getName(); // Email from JWT sub
+        return userService.getUserByEmail(email);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/update-profile")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void udpateProfileInfo(

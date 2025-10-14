@@ -14,6 +14,8 @@ import { deactivate } from '../fn/user/deactivate';
 import { Deactivate$Params } from '../fn/user/deactivate';
 import { delete$ } from '../fn/user/delete';
 import { Delete$Params } from '../fn/user/delete';
+import { getCurrentUser } from '../fn/user/get-current-user';
+import { GetCurrentUser$Params } from '../fn/user/get-current-user';
 import { getUsers } from '../fn/user/get-users';
 import { GetUsers$Params } from '../fn/user/get-users';
 import { reactivate } from '../fn/user/reactivate';
@@ -139,6 +141,33 @@ export class UserService extends BaseService {
     const resp = this.deactivate$Response(params, context);
     return resp.pipe(
       map((r: StrictHttpResponse<void>): void => r.body)
+    );
+  }
+
+  /** Path part for operation `getCurrentUser()` */
+  static readonly GetCurrentUserPath = '/api/v1/users/me';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `getCurrentUser()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getCurrentUser$Response(params?: GetCurrentUser$Params, context?: HttpContext): Observable<StrictHttpResponse<UserResponse>> {
+    const obs = getCurrentUser(this.http, this.rootUrl, params, context);
+    return obs;
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `getCurrentUser$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  getCurrentUser(params?: GetCurrentUser$Params, context?: HttpContext): Observable<UserResponse> {
+    const resp = this.getCurrentUser$Response(params, context);
+    return resp.pipe(
+      map((r: StrictHttpResponse<UserResponse>): UserResponse => r.body)
     );
   }
 

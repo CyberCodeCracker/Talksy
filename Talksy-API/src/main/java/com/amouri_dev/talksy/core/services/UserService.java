@@ -92,6 +92,17 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public UserResponse getUserByEmail(String email) {
+        log.debug("Fetching user by email: {}", email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("User not found: {}", email);
+                    return new EntityNotFoundException("User not found: " + email);
+                });
+        return mapper.toUserResponse(user);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found."));

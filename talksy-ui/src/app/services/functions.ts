@@ -31,6 +31,8 @@ export type { Reactivate$Params } from './fn/user/reactivate';
 export { reactivate } from './fn/user/reactivate';
 export type { Deactivate$Params } from './fn/user/deactivate';
 export { deactivate } from './fn/user/deactivate';
+export type { GetCurrentUser$Params } from './fn/user/get-current-user';
+export { getCurrentUser } from './fn/user/get-current-user';
 export type { GetUsers$Params } from './fn/user/get-users';
 export { getUsers } from './fn/user/get-users';
 export type { Delete$Params } from './fn/user/delete';

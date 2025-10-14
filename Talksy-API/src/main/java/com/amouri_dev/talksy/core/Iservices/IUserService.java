@@ -20,4 +20,6 @@ public interface IUserService extends UserDetailsService {
 
     void deleteAccount(Long userId);
     List<UserResponse> getAllUsersExceptSelf(Authentication authentication);
+
+    UserResponse getUserByEmail(String email);
 }

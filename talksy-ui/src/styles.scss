@@ -1,8 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 @import "bootstrap/dist/css/bootstrap.min.css";
 @import "@fortawesome/fontawesome-free/css/all.min.css";
+@import "@ctrl/ngx-emoji-mart/picker";
 
 $light-gray: #e9e5e5;
+$dark-gray: #c5c3c3;
 $light-blue: #cee8fc;
 
 @keyframes float {
@@ -52,6 +54,10 @@ body {
 
 .gray-bg {
   background-color: $light-gray !important;
+}
+
+.dark-gray-bg {
+  background-color: $dark-gray !important;
 }
 
 .cursor-pointer {
