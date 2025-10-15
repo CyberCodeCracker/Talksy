@@ -41,7 +41,6 @@ public class ChatService implements IChatService {
         List<Chat> chats = chatRepository.findChatsBySenderId(userId);
         log.debug("Found {} chats for user: {}", chats.size(), email);
 
-        // Handle empty chats
         if (chats == null || chats.isEmpty()) {
             log.info("No chats found for user: {}", email);
             return Collections.emptyList();
@@ -54,23 +53,37 @@ public class ChatService implements IChatService {
 
     @Override
     @Transactional
-    public Long createChat(Long senderId, Long recipientId) {
+    public ChatResponse createChat(Long senderId, Long recipientId) { // Changed: Return ChatResponse
+        log.info("Creating chat between senderId={} and recipientId={}", senderId, recipientId);
+
+        // Check for existing chat
         Optional<Chat> existingChat = chatRepository.findChatBetweenUsers(senderId, recipientId);
         if (existingChat.isPresent()) {
-            return existingChat.get().getId();
+            log.info("Existing chat found: {}", existingChat.get().getId());
+            return mapper.toChatResponse(existingChat.get(), senderId);
         }
 
-        User sender = this.findUserById(senderId);
-        User recipient = this.findUserById(recipientId);
+        try {
+            User sender = this.findUserById(senderId);
+            User recipient = this.findUserById(recipientId);
+            log.debug("Found users: sender={}, recipient={}", sender.getEmail(), recipient.getEmail());
 
-        Chat chat = new Chat();
-        chat.setSender(sender);
-        chat.setRecipient(recipient);
+            Chat chat = new Chat();
+            chat.setSender(sender);
+            chat.setRecipient(recipient);
 
-        return chatRepository.save(chat).getId();
+            Chat savedChat = chatRepository.save(chat);
+            log.info("Created new chat with ID: {}", savedChat.getId());
+
+            return mapper.toChatResponse(savedChat, senderId);
+        } catch (Exception e) {
+            log.error("Error creating chat: {}", e.getMessage(), e);
+            throw e; // Re-throw to get 500 with details
+        }
     }
 
     private User findUserById(Long userId) {
+        log.debug("Finding user by ID: {}", userId);
         return userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User with id " + userId + " not found"));
     }

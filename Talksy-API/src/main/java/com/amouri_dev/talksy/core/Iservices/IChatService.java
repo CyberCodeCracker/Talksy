@@ -8,5 +8,5 @@ import java.util.List;
 public interface IChatService {
 
     List<ChatResponse> getChatsByRecipientID(Authentication auth);
-    Long createChat(Long senderId, Long recipientId);
+    ChatResponse createChat(Long senderId, Long recipientId);
 }

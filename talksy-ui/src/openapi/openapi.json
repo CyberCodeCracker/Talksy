@@ -90,7 +90,7 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "type": "integer", "format": "int64" }
+                "schema": { "$ref": "#/components/schemas/ChatResponse" }
               }
             }
           }
@@ -371,6 +371,19 @@
           "chatId": { "type": "integer", "format": "int64" }
         }
       },
+      "ChatResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int64" },
+          "name": { "type": "string" },
+          "unreadChatsCount": { "type": "integer", "format": "int64" },
+          "lastMessage": { "type": "string" },
+          "lastMessageTime": { "type": "string", "format": "date-time" },
+          "senderId": { "type": "integer", "format": "int64" },
+          "recipientId": { "type": "integer", "format": "int64" },
+          "recipientOnline": { "type": "boolean" }
+        }
+      },
       "RegistrationRequest": {
         "required": ["email", "firstName", "lastName", "nickname", "password"],
         "type": "object",
@@ -475,19 +488,6 @@
           "recipientId": { "type": "integer", "format": "int64" },
           "createdAt": { "type": "string", "format": "date-time" },
           "media": { "type": "string", "format": "byte" }
-        }
-      },
-      "ChatResponse": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "format": "int64" },
-          "name": { "type": "string" },
-          "unreadChatsCount": { "type": "integer", "format": "int64" },
-          "lastMessage": { "type": "string" },
-          "lastMessageTime": { "type": "string", "format": "date-time" },
-          "senderId": { "type": "integer", "format": "int64" },
-          "recipientId": { "type": "integer", "format": "int64" },
-          "recipientOnline": { "type": "boolean" }
         }
       }
     },

@@ -2,26 +2,29 @@ package com.amouri_dev.talksy.core.mappers;
 
 import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.entities.chat.ChatResponse;
-import lombok.*;
-import org.springframework.stereotype.Service;
+import com.amouri_dev.talksy.entities.user.User;
+import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
-@Service
+import java.time.LocalDateTime;
+
+@Component
 public class ChatMapper {
-    public ChatResponse toChatResponse(Chat chat, Long senderId) {
-        if (chat == null) {
-            return null;
-        }
+
+    public ChatResponse toChatResponse(Chat chat, Long currentUserId) {
+        User currentUser = currentUserId.equals(chat.getSender().getId()) ?
+                chat.getSender() : chat.getRecipient();
+        User otherUser = currentUserId.equals(chat.getSender().getId()) ?
+                chat.getRecipient() : chat.getSender();
+
         return ChatResponse.builder()
                 .id(chat.getId())
-                .name(chat.getChatName(senderId))
-                .unreadChatsCount(chat.getUnreadMessagesCount(senderId))
-                .lastMessage(chat.getLastMessage())
-                .isRecipientOnline(chat.getRecipient().isUserOnline())
-                .senderId(senderId)
+                .senderId(chat.getSender().getId())
                 .recipientId(chat.getRecipient().getId())
-                .lastMessageTime(chat.getLastMessageTime())
+                .name(currentUser.getFirstName() + " " + currentUser.getLastName())
+                .lastMessage(chat.getLastMessage())
+                .lastMessageTime(chat.getLastMessageTime() != null ?
+                        LocalDateTime.parse(chat.getLastMessageTime().toString()) : null)
+                .unreadChatsCount(0L)
                 .build();
     }
 }

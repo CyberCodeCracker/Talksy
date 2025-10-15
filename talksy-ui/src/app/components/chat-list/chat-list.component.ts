@@ -40,7 +40,7 @@ export class ChatListComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         const chat: ChatResponse = {
-          id: res,
+          id: res.id,
           name: contact.firstName + ' ' + contact.lastName,
           recipientOnline: contact.online,
           lastMessageTime: contact.lastSeen,

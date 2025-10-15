@@ -65,8 +65,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    this.initWebSocket();
-    this.loadChats();
   }
 
   ngOnDestroy(): void {
@@ -152,30 +150,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   uploadMedia(target: EventTarget | null): void {}
 
-  private initWebSocket() {
-    let ws = new SockJs('http://localhost:8080/ws');
-    this.socketClient = Stomp.over(ws);
-    const subUrl = `/user/${this.currentUserId}/chat`;
-    this.socketClient.connect(
-      {
-        Authorization: 'Bearer ' + this.tokenService.getAccessToken(),
-      },
-      () => {
-        this.notificationSubscription = this.socketClient.subscribe(
-          subUrl,
-          (message: any) => {
-            const notification: Notification = JSON.parse(message.body);
-
-            this.handleNotification(notification);
-          },
-          () => {
-            console.log('Error while connecting to websocket');
-          }
-        );
-      }
-    );
-  }
-
   private handleNotification(notification: Notification) {
     if (!notification) return;
     if (this.selectedChat && this.selectedChat.id === notification.chatId) {
@@ -228,21 +202,64 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadCurrentUser(): void {
-    const subscription = this.userService.getCurrentUser().subscribe({
-      next: (user: UserResponse) => {
-        this.currentUserId = user.id || null;
-        console.log('Current user ID:', this.currentUserId);
-      },
-      error: (err) => {
-        console.error('Error loading current user:', err);
-        this.currentUserId = null;
-      },
-    });
-    this.destroyRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
+private loadCurrentUser(): void {
+  const subscription = this.userService.getCurrentUser().subscribe({
+    next: (user: UserResponse) => {
+      this.currentUserId = user.id || null;
+      console.log('Current user ID:', this.currentUserId);
+      
+      // CRITICAL: Initialize WebSocket ONLY after currentUserId is set
+      if (this.currentUserId) {
+        this.initWebSocket();
+      } else {
+        console.error('Cannot initialize WebSocket: currentUserId is null');
+      }
+    },
+    error: (err) => {
+      console.error('Error loading current user:', err);
+      this.currentUserId = null;
+    },
+  });
+  this.destroyRef.onDestroy(() => {
+    subscription.unsubscribe();
+  });
+}
+
+private initWebSocket(): void {
+  if (!this.currentUserId) {
+    console.error('Cannot initialize WebSocket: currentUserId is null');
+    return;
   }
+
+  let ws = new SockJs('http://localhost:8080/websocket');
+  this.socketClient = Stomp.over(ws);
+  
+  const subUrl = `/user/${this.currentUserId}/chat`;
+  console.log('Connecting to WebSocket:', subUrl);
+  
+  this.socketClient.connect(
+    {
+      Authorization: 'Bearer ' + this.tokenService.getAccessToken(),
+    },
+    () => {
+      console.log('WebSocket connected successfully');
+      this.notificationSubscription = this.socketClient.subscribe(
+        subUrl,
+        (message: any) => {
+          const notification: Notification = JSON.parse(message.body);
+          console.log('Received notification:', notification);
+          this.handleNotification(notification);
+        },
+        (error: any) => {
+          console.error('Error in WebSocket subscription:', error);
+        }
+      );
+    },
+    (error: any) => {
+      console.error('Error while connecting to WebSocket:', error);
+    }
+  );
+}
 
   private getSenderId(): number | undefined {
     if (this.selectedChat.senderId === this.currentUserId) {

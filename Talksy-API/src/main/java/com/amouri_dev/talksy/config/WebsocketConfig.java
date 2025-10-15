@@ -28,13 +28,14 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/user");
         registry.setApplicationDestinationPrefixes("/app");
-        registry.setUserDestinationPrefix("/users");
+        registry.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/websocket")
+                .setAllowedOriginPatterns("http://localhost:4200")
                 .setAllowedOrigins("http://localhost:4200")
                 .withSockJS()
         ;

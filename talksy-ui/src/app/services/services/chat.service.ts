@@ -35,7 +35,7 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  createChat$Response(params: CreateChat$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+  createChat$Response(params: CreateChat$Params, context?: HttpContext): Observable<StrictHttpResponse<ChatResponse>> {
     const obs = createChat(this.http, this.rootUrl, params, context);
     return obs;
   }
@@ -46,10 +46,10 @@ export class ChatService extends BaseService {
    *
    * This method doesn't expect any request body.
    */
-  createChat(params: CreateChat$Params, context?: HttpContext): Observable<number> {
+  createChat(params: CreateChat$Params, context?: HttpContext): Observable<ChatResponse> {
     const resp = this.createChat$Response(params, context);
     return resp.pipe(
-      map((r: StrictHttpResponse<number>): number => r.body)
+      map((r: StrictHttpResponse<ChatResponse>): ChatResponse => r.body)
     );
   }
 

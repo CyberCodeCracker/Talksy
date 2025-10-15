@@ -43,6 +43,7 @@ public class UserMapper {
 
     public UserResponse toUserResponse(User user) {
         return UserResponse.builder()
+                .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .isOnline(user.isUserOnline())

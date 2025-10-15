@@ -1,7 +1,6 @@
 package com.amouri_dev.talksy.controllers;
 
 import com.amouri_dev.talksy.core.Iservices.IChatService;
-import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.entities.chat.ChatResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,11 @@ public class ChatController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/create-chat")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Long createChat(
-            @RequestParam(name = "sender-id") final Long senderId,
-            @RequestParam(name = "recipient-id") final Long recipientId
+    public ChatResponse createChat( // Changed: Return ChatResponse
+                                    @RequestParam(name = "sender-id") final Long senderId,
+                                    @RequestParam(name = "recipient-id") final Long recipientId
     ) {
-       return this.chatService.createChat(senderId, recipientId);
+        return this.chatService.createChat(senderId, recipientId); // Now returns ChatResponse
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")

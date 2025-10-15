@@ -1,5 +1,6 @@
 package com.amouri_dev.talksy.config;
 
+import com.amouri_dev.talksy.infrastructure.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ public class BeansConfig {
     private List<String> allowedCorsOrigins;
     private final UserDetailsService userDetailsService;
     private final PasswordConfig passwordConfig;
+    private final UserRepository userRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(final AuthenticationConfiguration config) throws Exception {
@@ -43,17 +45,18 @@ public class BeansConfig {
 
     @Bean
     public AuditorAware<Long> auditorProvider() {
-        return new AppAuditorAware();
+        return new AppAuditorAware(userRepository);
     }
 
     @Bean
     public CorsFilter corsFilter() {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         final CorsConfiguration config = new CorsConfiguration();
-        // config.setAllowCredentials(true);
+        config.setAllowCredentials(true);
         config.setAllowedOrigins(allowedCorsOrigins);
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("*"));
+        config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }

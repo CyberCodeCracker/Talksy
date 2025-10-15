@@ -25,6 +25,7 @@ public class SecurityConfig {
             "/v2/api-docs",
             "/v3/api-docs",
             "/v3/api-docs/**",
+            "/websocket/**",
             "/swagger-resources",
             "/swagger-resources/**",
             "/configuration/ui",

@@ -7,13 +7,14 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
+import { ChatResponse } from '../../models/chat-response';
 
 export interface CreateChat$Params {
   'sender-id': number;
   'recipient-id': number;
 }
 
-export function createChat(http: HttpClient, rootUrl: string, params: CreateChat$Params, context?: HttpContext): Observable<StrictHttpResponse<number>> {
+export function createChat(http: HttpClient, rootUrl: string, params: CreateChat$Params, context?: HttpContext): Observable<StrictHttpResponse<ChatResponse>> {
   const rb = new RequestBuilder(rootUrl, createChat.PATH, 'post');
   if (params) {
     rb.query('sender-id', params['sender-id'], {});
@@ -25,7 +26,7 @@ export function createChat(http: HttpClient, rootUrl: string, params: CreateChat
   ).pipe(
     filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
     map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: parseFloat(String((r as HttpResponse<any>).body)) }) as StrictHttpResponse<number>;
+      return r as StrictHttpResponse<ChatResponse>;
     })
   );
 }
