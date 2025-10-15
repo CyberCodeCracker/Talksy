@@ -20,7 +20,9 @@
         />
         <app-chat-list
           [chats]="chats"
+          [currentUserId]="currentUserId"
           [searchNewContact]="searchNewContact()"
+          (searchNewContactChange)="updateSearchContact($event)"
           (chatSelected)="chatSelected($event)"
         />
       </div>
