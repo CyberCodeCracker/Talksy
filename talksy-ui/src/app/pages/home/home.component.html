@@ -17,11 +17,14 @@
         <app-contact-list
           [isSearching]="searchNewContact()"
           (searchNewContact)="updateSearchContact($event)"
+          (searchTextChange)="updateSearchText($event)"
+          (filterChange)="setChatFilter($event)"
         />
         <app-chat-list
-          [chats]="chats"
+          [chats]="filteredChats()"
           [currentUserId]="currentUserId"
           [searchNewContact]="searchNewContact()"
+          [contactSearch]="contactSearch()"
           (searchNewContactChange)="updateSearchContact($event)"
           (chatSelected)="chatSelected($event)"
         />

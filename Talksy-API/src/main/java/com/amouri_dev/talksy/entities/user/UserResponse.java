@@ -16,4 +16,5 @@ public class UserResponse {
     private String lastName;
     private LocalDateTime lastSeen;
     private boolean isOnline;
+    private String nickname;
 }

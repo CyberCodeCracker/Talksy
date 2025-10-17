@@ -18,6 +18,8 @@ import { getCurrentUser } from '../fn/user/get-current-user';
 import { GetCurrentUser$Params } from '../fn/user/get-current-user';
 import { getUsers } from '../fn/user/get-users';
 import { GetUsers$Params } from '../fn/user/get-users';
+import { logout } from '../fn/user/logout';
+import { Logout$Params } from '../fn/user/logout';
 import { reactivate } from '../fn/user/reactivate';
 import { Reactivate$Params } from '../fn/user/reactivate';
 import { udpateProfileInfo } from '../fn/user/udpate-profile-info';
@@ -34,6 +36,33 @@ import { UserResponse } from '../models/user-response';
 export class UserService extends BaseService {
   constructor(config: ApiConfiguration, http: HttpClient) {
     super(config, http);
+  }
+
+  /** Path part for operation `logout()` */
+  static readonly LogoutPath = '/api/v1/users/logout';
+
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `logout()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  logout$Response(params?: Logout$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+    const obs = logout(this.http, this.rootUrl, params, context);
+    return obs;
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `logout$Response()` instead.
+   *
+   * This method doesn't expect any request body.
+   */
+  logout(params?: Logout$Params, context?: HttpContext): Observable<void> {
+    const resp = this.logout$Response(params, context);
+    return resp.pipe(
+      map((r: StrictHttpResponse<void>): void => r.body)
+    );
   }
 
   /** Path part for operation `udpateProfileInfo()` */

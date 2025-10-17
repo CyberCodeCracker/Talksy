@@ -1,7 +1,6 @@
 package com.amouri_dev.talksy.core.services;
 
 import com.amouri_dev.talksy.core.Iservices.IUserService;
-import com.amouri_dev.talksy.entities.role.Role;
 import com.amouri_dev.talksy.entities.user.User;
 import com.amouri_dev.talksy.core.mappers.UserMapper;
 import com.amouri_dev.talksy.entities.user.UserResponse;
@@ -103,11 +102,16 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void logout(Long userId) {
+        User user = this.findUserById(userId);
+        user.setLastSeen(null);
+        this.userRepository.save(user);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = this.userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email: " + email + " not found."));
-
-        log.info("User Role: {}", user.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
         return user;
     }
 

@@ -1,5 +1,7 @@
 package com.amouri_dev.talksy.security;
 
+import com.amouri_dev.talksy.entities.user.User;
+import com.amouri_dev.talksy.infrastructure.UserRepository; // ✅ ADD
 import com.amouri_dev.talksy.utils.KeyUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -23,6 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.security.PublicKey;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,11 +36,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+    private final UserRepository userRepository;
     private final PublicKey publicKey;
 
-    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService) throws Exception {
+    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService,
+                     UserRepository userRepository) throws Exception {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
         this.publicKey = KeyUtils.loadPublicKey("/keys/local-only/public_key.pem");
     }
 
@@ -69,19 +75,27 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 Claims claims = extractClaims(jwt);
                 if (this.jwtService.isTokenValid(jwt, username)) {
-                    // Extract authorities from token claims (stateless)
+
+                    // ✅ ADD: Update lastSeen (5 lines)
+                    User user = (User) userDetailsService.loadUserByUsername(username);
+                    if (user.getLastSeen() == null ||
+                            user.getLastSeen().isBefore(LocalDateTime.now().minusSeconds(30))) {
+                        user.setLastSeen(LocalDateTime.now());
+                        userRepository.save(user);
+                    }
+
                     @SuppressWarnings("unchecked")
                     List<String> authoritiesStr = claims.get("authorities", List.class);
                     Collection<GrantedAuthority> authorities = authoritiesStr.stream()
                             .map(SimpleGrantedAuthority::new)
                             .collect(Collectors.toList());
 
-                    // Create UserDetails-like principal (or use a custom JwtUserDetails)
                     UserDetails userDetails = org.springframework.security.core.userdetails.User
                             .withUsername(username)
-                            .password("")  // No password needed for JWT
+                            .password("")  
                             .authorities(authorities)
-                            .build();
+                            .build()
+                            ;
 
                     final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,

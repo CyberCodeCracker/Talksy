@@ -22,4 +22,6 @@ public interface IUserService extends UserDetailsService {
     List<UserResponse> getAllUsersExceptSelf(Authentication authentication);
 
     UserResponse getUserByEmail(String email);
+
+    void logout(Long userId);
 }

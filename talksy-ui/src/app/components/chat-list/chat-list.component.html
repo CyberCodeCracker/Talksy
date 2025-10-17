@@ -30,11 +30,11 @@
         {{ chat.lastMessageTime | date : "dd.MM.yy HH:mm" }}
       </span>
       @if(chat.unreadChatsCount && chat.unreadChatsCount > 0) {
-      <small class="unread-msg-badge"></small>
+      <small class="unread-msg-badge">{{ chat.unreadChatsCount }}</small>
       }
     </div>
   </div>
-  } } @else if (searchNewContact()) { @for (contact of contacts; track contact)
+  } } @else if (searchNewContact()) { @for (contact of filteredContacts(); track contact)
   {
   <div
     class="d-flex align-items-center justify-content-between border-bottom-gray p-2"
@@ -45,12 +45,12 @@
         <img src="/assets/images/user.png" alt="" />
       </div>
       <div class="d-flex flex-column">
-        <span>{{ contact.firstName + "" + contact.lastName }}</span>
+        <span>{{ contact.nickname }}</span>
         @if (contact.online) {
         <small class="text-secondary">Online</small>
         } @else {
         <small class="text-secondary"
-          >Last seen &nbsp; {{ contact.lastSeen | date: 'dd.mm.yyyy HH:mm'}}</small
+          >Last seen &nbsp; {{ contact.lastSeen | date: 'dd.MM.yyyy HH:mm'}}</small
         >
         }
       </div>

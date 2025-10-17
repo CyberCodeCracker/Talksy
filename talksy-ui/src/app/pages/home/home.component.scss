@@ -33,7 +33,7 @@ $light-blue: #cee8fc;
   max-height: 10px;
   min-width: 10px;
   max-width: 10px;
-  border: 50%;
+  border-radius: 50%;
   font-size: 0.8rem;
   font-weight: bold;
   display: flex;
@@ -129,14 +129,18 @@ i {
     color: #53bdeb;
   }
   &.ml-neg {
-    margin-left: -7px;
+    margin-left: -10px;
   }
 }
 
 .fa-door-open,
-.fa-user {
+.fa-user
+{
+  color: blue;
+  padding: 1px;
+  border-radius: 50%;
   &:hover {
-    color: blue;
+    background-color: lightblue;
   }
 }
 

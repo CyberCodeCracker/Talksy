@@ -50,7 +50,7 @@ public class MessageService implements IMessageService {
                 .senderId(request.getSenderId())
                 .recipientId(request.getReceiverId())
                 .type(NotificationType.MESSAGE)
-                .chatName(chat.getChatName(message.getSenderId()))
+                .chatName(chat.getTargetChatName(message.getSenderId()))
                 .build()
                 ;
         notificationService.sendNotification(message.getRecipientId(), notification);

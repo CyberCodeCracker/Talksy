@@ -48,6 +48,7 @@ public class UserMapper {
                 .lastName(user.getLastName())
                 .isOnline(user.isUserOnline())
                 .lastSeen(user.getLastSeen())
+                .nickname(user.getNickname())
                 .build()
                 ;
     }

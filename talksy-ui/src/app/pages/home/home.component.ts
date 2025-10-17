@@ -2,7 +2,6 @@ import {
   Component,
   DestroyRef,
   inject,
-  input,
   OnDestroy,
   OnInit,
   signal,
@@ -62,9 +61,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   private router = inject(Router);
 
   searchNewContact = signal(false);
+  // Search text for contacts and filter for chat list
+  contactSearch = signal<string>('');
+  chatFilter = signal<'all' | 'unread'>('all');
 
   ngOnInit(): void {
     this.loadCurrentUser();
+    // Ensure chats are loaded at startup
+    this.loadChats();
   }
 
   ngOnDestroy(): void {
@@ -77,6 +81,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   updateSearchContact(newValue: boolean) {
     this.searchNewContact.set(newValue);
+  }
+
+  updateSearchText(text: string) {
+    this.contactSearch.set(text);
+  }
+
+  setChatFilter(filter: 'all' | 'unread') {
+    this.chatFilter.set(filter);
   }
 
   isSelfMessage(message: MessageResponse): boolean {
@@ -94,8 +106,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.selectedChat = chatResponse;
     this.getAllChatMessages(chatResponse.id ? chatResponse.id : 0);
     this.setMessagesToSeen();
-    console.log(this.selectedChat.name);
     this.selectedChat.unreadChatsCount = 0;
+    console.log("Is recipient online: " + this.selectedChat.recipientOnline);
   }
 
   onClick() {
@@ -139,7 +151,8 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onSelectEmojis(emojiSelected: any) {
     const emoji: EmojiData = emojiSelected.emoji;
-    this.messageContent += emoji.name;
+
+    this.messageContent += (emoji as any).native ?? emoji.name;
   }
 
   keyDown(event: KeyboardEvent): void {
@@ -150,65 +163,51 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   uploadMedia(target: EventTarget | null): void {}
 
-  private handleNotification(notification: Notification) {
-    if (!notification) return;
-    if (this.selectedChat && this.selectedChat.id === notification.chatId) {
-      switch (notification.type) {
-        case 'MESSAGE':
-        case 'IMAGE':
-          const message: MessageResponse = {
-            senderId: notification.senderId,
-            recipientId: notification.recipientId,
-            message: notification.message,
-            type: notification.messageType,
-            media: notification.media,
-            createdAt: new Date().toString(),
-          };
-          if (notification.type === 'IMAGE') {
-            this.selectedChat.lastMessage = 'Attachment';
-          } else {
-            this.selectedChat.lastMessage = notification.message;
-          }
-          this.chatMessages.push(message);
-          break;
-        case 'SEEN':
-          this.chatMessages.forEach((m) => (m.state = 'SEEN'));
-          break;
-      }
-    } else {
-      const destChat = this.chats.find(
-        (chat) => chat.id === notification.chatId
-      );
-      if (destChat && notification.type !== 'SEEN') {
-        if (notification.type === 'MESSAGE') {
-          destChat.lastMessage = notification.message;
-        } else if (notification.type === 'IMAGE') {
-          destChat.lastMessage = 'Attachment';
-        }
-        destChat.lastMessageTime = new Date().toString();
-        destChat.unreadChatsCount! += 1;
-      } else if (notification.type === 'MESSAGE') {
-        const newChat: ChatResponse = {
-          id: notification.chatId,
+private handleNotification(notification: Notification) {
+  console.log(`🔔 Notification [${notification.type}] for chat ${notification.chatId}:`, notification);
+  
+  if (!notification) return;
+  
+  if (this.selectedChat && this.selectedChat.id === notification.chatId) {
+    switch (notification.type) {
+      case 'MESSAGE':
+      case 'IMAGE':
+        const content = (notification as any).content ?? notification.message;
+        console.log('📱 Adding message to UI:', content); 
+        const message: MessageResponse = {
           senderId: notification.senderId,
           recipientId: notification.recipientId,
-          lastMessage: notification.message,
-          name: notification.chatName,
-          unreadChatsCount: 1,
-          lastMessageTime: new Date().toString(),
+          message: content, 
+          type: notification.messageType, 
+          media: notification.media,
+          createdAt: new Date().toString(),
         };
-        this.chats.unshift(newChat);
-      }
+        this.chatMessages.push(message);
+        
+        this.selectedChat.lastMessage = content || 'Attachment';
+        break;
+        
+      case 'SEEN':
+        console.log('👁️ Marking messages as SEEN');
+        this.chatMessages.forEach((m) => (m.state = 'SEEN'));
+        break;
+    }
+  } else {
+    const destChat = this.chats.find((chat) => chat.id === notification.chatId);
+    if (destChat && notification.type !== 'SEEN') {
+      const content = (notification as any).content ?? notification.message;
+      destChat.lastMessage = content || 'Attachment';
+      destChat.lastMessageTime = new Date().toString();
+      destChat.unreadChatsCount = (destChat.unreadChatsCount ?? 0) + 1;
     }
   }
+}
 
 private loadCurrentUser(): void {
   const subscription = this.userService.getCurrentUser().subscribe({
     next: (user: UserResponse) => {
       this.currentUserId = user.id || null;
       console.log('Current user ID:', this.currentUserId);
-      
-      // CRITICAL: Initialize WebSocket ONLY after currentUserId is set
       if (this.currentUserId) {
         this.initWebSocket();
       } else {
@@ -317,5 +316,13 @@ private initWebSocket(): void {
         this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
     });
+  }
+
+  filteredChats(): Array<ChatResponse> {
+    const filter = this.chatFilter();
+    if (filter === 'unread') {
+      return (this.chats || []).filter(c => (c.unreadChatsCount ?? 0) > 0);
+    }
+    return this.chats || [];
   }
 }

@@ -6,5 +6,6 @@ export interface UserResponse {
   id?: number;
   lastName?: string;
   lastSeen?: string;
+  nickname?: string;
   online?: boolean;
 }

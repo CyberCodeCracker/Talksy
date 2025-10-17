@@ -31,6 +31,14 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
+    public void logout(
+            final Authentication principal
+    ) {
+        this.userService.logout(getUserId(principal));
+    }
+
     @PreAuthorize("hasRole('ROLE_USER')")
     @PatchMapping("/me/update-profile")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)

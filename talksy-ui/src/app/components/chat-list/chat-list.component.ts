@@ -12,6 +12,7 @@ import { ChatService, UserService } from '../../services/services';
 export class ChatListComponent implements OnInit {
   chats: InputSignal<ChatResponse[]> = input<ChatResponse[]>([]);
   searchNewContact = input<boolean>();
+  contactSearch = input<string>('');
   contacts: Array<UserResponse> = [];
   chatSelected = output<ChatResponse>();
   searchNewContactChange = output<boolean>();
@@ -40,14 +41,16 @@ export class ChatListComponent implements OnInit {
     }).subscribe({
       next: (res) => {
         const chat: ChatResponse = {
+          ...res,
           id: res.id,
-          name: contact.firstName + ' ' + contact.lastName,
+          name: contact.nickname || `${contact.firstName ?? ''} ${contact.lastName ?? ''}`.trim(),
           recipientOnline: contact.online,
-          lastMessageTime: contact.lastSeen,
+          lastMessage: res.lastMessage ?? '',
+          lastMessageTime: res.lastMessageTime ?? contact.lastSeen,
           senderId: this.currentUserId() ?? undefined,
-          recipientId: contact.id
+          recipientId: contact.id,
+          unreadChatsCount: 0
         };
-        // insert at beginning
         this.chats().unshift(chat);
         this.searchNewContactChange.emit(false);
         this.chatSelected.emit(chat);
@@ -65,11 +68,16 @@ export class ChatListComponent implements OnInit {
     return message?.substring(0, 17) + '...' || '';
   }
 
+  filteredContacts(): UserResponse[] {
+    const q = (this.contactSearch() || '').toLowerCase().trim();
+    if (!q) return this.contacts;
+    return this.contacts.filter(c => (c.nickname || '').toLowerCase().includes(q));
+  }
+
   private loadUsers(): void {
     this.userService.getUsers().subscribe({
       next: (users: UserResponse[]) => {
         this.contacts = users || [];
-        console.log('Loaded contacts:', this.contacts);
       },
       error: (err) => {
         console.error('Error loading contacts:', err);
@@ -81,9 +89,8 @@ export class ChatListComponent implements OnInit {
   private loadChats(): void {
     this.chatService.getAllChatsByRecipientId().subscribe({
       next: (chats: ChatResponse[]) => {
-        this.contacts = []; // Clear contacts when showing chats
+        this.contacts = []; 
         console.log('Loaded chats:', chats);
-        // Assuming chats are updated in parent via binding
       },
       error: (err) => {
         console.error('Error loading chats:', err);

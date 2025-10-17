@@ -24,6 +24,13 @@
     { "name": "Message", "description": "Message API" }
   ],
   "paths": {
+    "/api/v1/users/logout": {
+      "post": {
+        "tags": ["User"],
+        "operationId": "logout",
+        "responses": { "200": { "description": "OK" } }
+      }
+    },
     "/api/v1/messages/upload-media": {
       "post": {
         "tags": ["Message"],
@@ -471,6 +478,7 @@
           "firstName": { "type": "string" },
           "lastName": { "type": "string" },
           "lastSeen": { "type": "string", "format": "date-time" },
+          "nickname": { "type": "string" },
           "online": { "type": "boolean" }
         }
       },

@@ -22,11 +22,11 @@ public class ChatController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @PostMapping("/create-chat")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ChatResponse createChat( // Changed: Return ChatResponse
+    public ChatResponse createChat(
                                     @RequestParam(name = "sender-id") final Long senderId,
                                     @RequestParam(name = "recipient-id") final Long recipientId
     ) {
-        return this.chatService.createChat(senderId, recipientId); // Now returns ChatResponse
+        return this.chatService.createChat(senderId, recipientId);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")

@@ -66,6 +66,8 @@ public class AuthenticationService implements IAuthenticationService {
         );
 
         final User user = (User) authentication.getPrincipal();
+        user.setLastSeen(LocalDateTime.now());
+        userRepository.save(user);
         final UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         final String accessToken = this.jwtService.generateAccessToken(userDetails);
         final String refreshToken = this.jwtService.generateRefreshToken(userDetails.getUsername());
