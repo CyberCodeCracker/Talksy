@@ -7,29 +7,35 @@ import { filter, map } from 'rxjs/operators';
 import { StrictHttpResponse } from '../../strict-http-response';
 import { RequestBuilder } from '../../request-builder';
 
-
 export interface UploadMedia$Params {
   'chat-id': number;
-      body?: {
-'file': Blob;
-}
+  body?: {
+    file: Blob;
+  };
 }
 
-export function uploadMedia(http: HttpClient, rootUrl: string, params: UploadMedia$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function uploadMedia(
+  http: HttpClient,
+  rootUrl: string,
+  params: UploadMedia$Params,
+  context?: HttpContext
+): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, uploadMedia.PATH, 'post');
   if (params) {
     rb.query('chat-id', params['chat-id'], {});
     rb.body(params.body, 'multipart/form-data');
   }
 
-  return http.request(
-    rb.build({ responseType: 'text', accept: '*/*', context })
-  ).pipe(
-    filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
-    map((r: HttpResponse<any>) => {
-      return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
-    })
-  );
+  return http
+    .request(rb.build({ responseType: 'text', accept: '*/*', context }))
+    .pipe(
+      filter((r: any): r is HttpResponse<any> => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return (r as HttpResponse<any>).clone({
+          body: undefined,
+        }) as StrictHttpResponse<void>;
+      })
+    );
 }
 
 uploadMedia.PATH = '/api/v1/messages/upload-media';

@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import {
   RegistrationRequest
 } from '../../services/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
 import { ConfirmAccountComponent } from '../../components/confirm-account/confirm-account.component';
 
@@ -16,7 +16,7 @@ import { ConfirmAccountComponent } from '../../components/confirm-account/confir
 export class RegisterComponent {
 
   private authService = inject(AuthenticationService);
-  private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   registerRequest: RegistrationRequest = {
     email: '',
@@ -53,7 +53,7 @@ export class RegisterComponent {
     this.registerRequest.lastName = this.registrationForm.value.lastName ?? '';
     this.registerRequest.nickname = this.registrationForm.value.nickname ?? '';
     this.registerRequest.password = this.registrationForm.value.password ?? '';
-    this.authService.register({
+    const subscription = this.authService.register({
       body: this.registerRequest
     }).subscribe({
       next: (res) => {
@@ -68,7 +68,10 @@ export class RegisterComponent {
           this.addError('An error occurred during registration. Please try again.');
         }
       }
-    })
+    });
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
   }
 
   closeConfirmModal() {

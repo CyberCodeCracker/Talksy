@@ -1,10 +1,13 @@
 import {
+  AfterViewChecked,
   Component,
   DestroyRef,
+  ElementRef,
   inject,
   OnDestroy,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { ChatListComponent } from '../../components/chat-list/chat-list.component';
 import {
@@ -28,6 +31,7 @@ import { EmojiData } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import * as Stomp from 'stompjs';
 import SockJs from 'sockjs-client';
 import { Notification } from './Notification';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -42,7 +46,7 @@ import { Notification } from './Notification';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
   chats: Array<ChatResponse> = [];
   selectedChat: ChatResponse = {};
   chatMessages: Array<MessageResponse> = [];
@@ -51,8 +55,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   messageContent: string = '';
   recipientId = this.getSenderId();
   socketClient: any = null;
-  private notificationSubscription: any;
+  @ViewChild('scrollableDiv') scrollableDiv!: ElementRef<HTMLDivElement>;
 
+  private notificationSubscription: any;
   private destroyRef = inject(DestroyRef);
   private chatService = inject(ChatService);
   private messageService = inject(MessageService);
@@ -61,14 +66,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   private router = inject(Router);
 
   searchNewContact = signal(false);
-  // Search text for contacts and filter for chat list
   contactSearch = signal<string>('');
   chatFilter = signal<'all' | 'unread'>('all');
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    // Ensure chats are loaded at startup
     this.loadChats();
+  }
+
+  ngAfterViewChecked(): void {
+    this.scrollBottom();
   }
 
   ngOnDestroy(): void {
@@ -107,7 +114,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.getAllChatMessages(chatResponse.id ? chatResponse.id : 0);
     this.setMessagesToSeen();
     this.selectedChat.unreadChatsCount = 0;
-    console.log("Is recipient online: " + this.selectedChat.recipientOnline);
+    console.log('Is recipient online: ' + this.selectedChat.recipientOnline);
   }
 
   onClick() {
@@ -161,104 +168,161 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
-  uploadMedia(target: EventTarget | null): void {}
-
-private handleNotification(notification: Notification) {
-  console.log(`🔔 Notification [${notification.type}] for chat ${notification.chatId}:`, notification);
-  
-  if (!notification) return;
-  
-  if (this.selectedChat && this.selectedChat.id === notification.chatId) {
-    switch (notification.type) {
-      case 'MESSAGE':
-      case 'IMAGE':
-        const content = (notification as any).content ?? notification.message;
-        console.log('📱 Adding message to UI:', content); 
-        const message: MessageResponse = {
-          senderId: notification.senderId,
-          recipientId: notification.recipientId,
-          message: content, 
-          type: notification.messageType, 
-          media: notification.media,
-          createdAt: new Date().toString(),
-        };
-        this.chatMessages.push(message);
-        
-        this.selectedChat.lastMessage = content || 'Attachment';
-        break;
-        
-      case 'SEEN':
-        console.log('👁️ Marking messages as SEEN');
-        this.chatMessages.forEach((m) => (m.state = 'SEEN'));
-        break;
-    }
-  } else {
-    const destChat = this.chats.find((chat) => chat.id === notification.chatId);
-    if (destChat && notification.type !== 'SEEN') {
-      const content = (notification as any).content ?? notification.message;
-      destChat.lastMessage = content || 'Attachment';
-      destChat.lastMessageTime = new Date().toString();
-      destChat.unreadChatsCount = (destChat.unreadChatsCount ?? 0) + 1;
-    }
-  }
-}
-
-private loadCurrentUser(): void {
-  const subscription = this.userService.getCurrentUser().subscribe({
-    next: (user: UserResponse) => {
-      this.currentUserId = user.id || null;
-      console.log('Current user ID:', this.currentUserId);
-      if (this.currentUserId) {
-        this.initWebSocket();
-      } else {
-        console.error('Cannot initialize WebSocket: currentUserId is null');
-      }
-    },
-    error: (err) => {
-      console.error('Error loading current user:', err);
-      this.currentUserId = null;
-    },
-  });
-  this.destroyRef.onDestroy(() => {
-    subscription.unsubscribe();
-  });
-}
-
-private initWebSocket(): void {
-  if (!this.currentUserId) {
-    console.error('Cannot initialize WebSocket: currentUserId is null');
-    return;
-  }
-
-  let ws = new SockJs('http://localhost:8080/websocket');
-  this.socketClient = Stomp.over(ws);
-  
-  const subUrl = `/user/${this.currentUserId}/chat`;
-  console.log('Connecting to WebSocket:', subUrl);
-  
-  this.socketClient.connect(
-    {
-      Authorization: 'Bearer ' + this.tokenService.getAccessToken(),
-    },
-    () => {
-      console.log('WebSocket connected successfully');
-      this.notificationSubscription = this.socketClient.subscribe(
-        subUrl,
-        (message: any) => {
-          const notification: Notification = JSON.parse(message.body);
-          console.log('Received notification:', notification);
-          this.handleNotification(notification);
-        },
-        (error: any) => {
-          console.error('Error in WebSocket subscription:', error);
+  uploadMedia(target: EventTarget | null): void {
+    const file = this.extractFileFromTarget(target);
+    if (file !== null) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.result) {
+          const mediaLines = reader.result.toString().split(',')[1];
+          if (!this.selectedChat.id) return;
+          const subscription = this.messageService
+            .uploadMedia({
+              'chat-id': this.selectedChat.id,
+              body: {
+                file: file,
+              },
+            })
+            .subscribe({
+              next: () => {
+                const message: MessageResponse = {
+                  senderId: this.getSenderId(),
+                  recipientId: this.getRecipientId(),
+                  message: 'Attachment',
+                  type: 'IMAGE',
+                  state: 'SENT',
+                  media: [mediaLines],
+                  createdAt: new Date().toString(),
+                };
+                this.chatMessages.push(message);
+              },
+            });
+          this.destroyRef.onDestroy(() => {
+            subscription.unsubscribe();
+          });
         }
-      );
-    },
-    (error: any) => {
-      console.error('Error while connecting to WebSocket:', error);
+      };
+      reader.readAsDataURL(file);
     }
-  );
-}
+  }
+
+  filteredChats(): Array<ChatResponse> {
+    const filter = this.chatFilter();
+    if (filter === 'unread') {
+      return (this.chats || []).filter((c) => (c.unreadChatsCount ?? 0) > 0);
+    }
+    return this.chats || [];
+  }
+
+  private extractFileFromTarget(target: EventTarget | null): File | null {
+    const htmlInputTarget = target as HTMLInputElement;
+    if (target === null || htmlInputTarget.files === null) {
+      return null;
+    }
+    return htmlInputTarget.files[0];
+  }
+
+  private handleNotification(notification: Notification) {
+    console.log(
+      `🔔 Notification [${notification.type}] for chat ${notification.chatId}:`,
+      notification
+    );
+
+    if (!notification) return;
+
+    if (this.selectedChat && this.selectedChat.id === notification.chatId) {
+      switch (notification.type) {
+        case 'MESSAGE':
+        case 'IMAGE':
+          const content = (notification as any).content ?? notification.message;
+          console.log('📱 Adding message to UI:', content);
+          const message: MessageResponse = {
+            senderId: notification.senderId,
+            recipientId: notification.recipientId,
+            message: content,
+            type: notification.messageType,
+            media: notification.media,
+            createdAt: new Date().toString(),
+          };
+          this.chatMessages.push(message);
+
+          this.selectedChat.lastMessage = content || 'Attachment';
+          break;
+
+        case 'SEEN':
+          console.log('👁️ Marking messages as SEEN');
+          this.chatMessages.forEach((m) => (m.state = 'SEEN'));
+          break;
+      }
+    } else {
+      const destChat = this.chats.find(
+        (chat) => chat.id === notification.chatId
+      );
+      if (destChat && notification.type !== 'SEEN') {
+        const content = (notification as any).content ?? notification.message;
+        destChat.lastMessage = content || 'Attachment';
+        destChat.lastMessageTime = new Date().toString();
+        destChat.unreadChatsCount = (destChat.unreadChatsCount ?? 0) + 1;
+      }
+    }
+  }
+
+  private loadCurrentUser(): void {
+    const subscription = this.userService.getCurrentUser().subscribe({
+      next: (user: UserResponse) => {
+        this.currentUserId = user.id || null;
+        console.log('Current user ID:', this.currentUserId);
+        if (this.currentUserId) {
+          this.initWebSocket();
+        } else {
+          console.error('Cannot initialize WebSocket: currentUserId is null');
+        }
+      },
+      error: (err) => {
+        console.error('Error loading current user:', err);
+        this.currentUserId = null;
+      },
+    });
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    });
+  }
+
+  private initWebSocket(): void {
+    if (!this.currentUserId) {
+      console.error('Cannot initialize WebSocket: currentUserId is null');
+      return;
+    }
+
+    let ws = new SockJs('http://localhost:8080/websocket');
+    this.socketClient = Stomp.over(ws);
+
+    const subUrl = `/user/${this.currentUserId}/chat`;
+    console.log('Connecting to WebSocket:', subUrl);
+
+    this.socketClient.connect(
+      {
+        Authorization: 'Bearer ' + this.tokenService.getAccessToken(),
+      },
+      () => {
+        console.log('WebSocket connected successfully');
+        this.notificationSubscription = this.socketClient.subscribe(
+          subUrl,
+          (message: any) => {
+            const notification: Notification = JSON.parse(message.body);
+            console.log('Received notification:', notification);
+            this.handleNotification(notification);
+          },
+          (error: any) => {
+            console.error('Error in WebSocket subscription:', error);
+          }
+        );
+      },
+      (error: any) => {
+        console.error('Error while connecting to WebSocket:', error);
+      }
+    );
+  }
 
   private getSenderId(): number | undefined {
     if (this.selectedChat.senderId === this.currentUserId) {
@@ -285,6 +349,10 @@ private initWebSocket(): void {
           console.error('Error loading messages:', err);
         },
       });
+    this.destroySubscription(subscription);
+  }
+
+  private destroySubscription(subscription: Subscription) {
     this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
     });
@@ -298,9 +366,7 @@ private initWebSocket(): void {
       .subscribe({
         next: () => {},
       });
-    this.destroyRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
+    this.destroySubscription(subscription);
   }
 
   private loadChats(): void {
@@ -313,16 +379,13 @@ private initWebSocket(): void {
         console.error('Error loading chats:', err);
       },
     });
-        this.destroyRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
+    this.destroySubscription(subscription);
   }
 
-  filteredChats(): Array<ChatResponse> {
-    const filter = this.chatFilter();
-    if (filter === 'unread') {
-      return (this.chats || []).filter(c => (c.unreadChatsCount ?? 0) > 0);
+  private scrollBottom() {
+    if (this.scrollableDiv) {
+      const div = this.scrollableDiv.nativeElement;
+      div.scrollTop = div.scrollHeight;
     }
-    return this.chats || [];
   }
 }

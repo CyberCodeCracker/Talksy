@@ -1,10 +1,11 @@
-import { Component, inject } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { AuthenticationRequest } from '../../services/models';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
 import { HttpClient } from '@angular/common/http';
 import { TokenService } from '../../services/token.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ export class LoginComponent {
   private router = inject(Router);
   private authService = inject(AuthenticationService);
   private tokenService = inject(TokenService);
+  private destroyRef = inject(DestroyRef);
 
   addError(error: string) {
     this.errorMsgs.push(error);  
@@ -35,7 +37,7 @@ export class LoginComponent {
     this.errorMsgs = [];
     this.authRequest.email = this.loginForm.value.email ?? '';
     this.authRequest.password = this.loginForm.value.password ?? '';
-    this.authService.login({
+    const subscription = this.authService.login({
       body: this.authRequest
     }).subscribe({
       next: (response) => {
@@ -56,7 +58,14 @@ export class LoginComponent {
         }
       }
     });
+    this.destroySubscription(subscription);
   }
+
+  private destroySubscription(subscription: Subscription) {
+    this.destroyRef.onDestroy(() => {
+      subscription.unsubscribe();
+    })
+  };
 
 }
 
