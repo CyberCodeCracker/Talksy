@@ -12,6 +12,36 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    max-width: none;
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .modal-footer {
+    justify-content: center;
+  }
+
+  .modal-body code-input ::ng-deep input {
+    width: 42px !important;
+    height: 42px !important;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-body code-input ::ng-deep input {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 1rem;
+  }
+}
+
 .modal-content {
   background-color: #fff;
   border-radius: 16px;

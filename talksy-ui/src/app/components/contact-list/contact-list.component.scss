@@ -1,0 +1,25 @@
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .sticky-top.bg-white {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+
+  .input-group .form-control-sm {
+    width: 100% !important;
+    font-size: 0.95rem;
+  }
+
+  .badge.rounded-pill {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .badge.rounded-pill {
+    font-size: 0.75rem;
+    padding: 5px 8px;
+  }
+}

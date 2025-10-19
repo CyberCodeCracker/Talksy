@@ -14,4 +14,5 @@ public class MessageRequest {
     private Long receiverId;
     private MessageType messageType;
     private Long chatId;
+
 }

@@ -33,3 +33,26 @@
   justify-content: center;
   align-items: center;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .chat-list > div {
+    padding: 8px !important;
+  }
+
+  .msg-date {
+    font-size: 0.7rem;
+  }
+
+  .unread-msg-badge {
+    min-width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .msg-date {
+    font-size: 0.65rem;
+  }
+}

@@ -45,7 +45,7 @@ app:
   mail:
     from-email: souhailamouri123@gmail.com
     frontend:
-      activation-url: http://localhost:4200/activate-account*
+      activation-url: http://localhost:4200/login
   file:
     uploads:
       media-output-path: ./uploads

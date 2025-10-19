@@ -11,6 +11,11 @@
 
 .register-container {
   min-height: 50vh;
+  /* Keep container within viewport height even with alerts; account for page padding */
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* smoother on iOS */
+  overscroll-behavior: contain;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -23,16 +28,26 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   animation: slideInFromLeft 0.5s ease-out both;
   margin-top: 16px;
-  padding-top: 16px; 
+  padding-top: 16px;
 }
 
-.register-container > h3 { margin-top: 0; }
-.register-container > .alert { margin-top: 0; }
-.register-container hr { margin-top: 8px; }
+.register-container > h3 {
+  margin-top: 0;
+}
+.register-container > .alert {
+  margin-top: 0;
+}
+.register-container hr {
+  margin-top: 8px;
+}
 
 form {
   padding: 50px;
   width: 100%;
+  /* Ensure the form itself scrolls if alerts or content push below viewport */
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 button {
@@ -50,4 +65,29 @@ button {
 
 button:hover {
   background-color: #0056b3;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .register-container {
+    width: 100% !important;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  form {
+    padding: 20px;
+    max-height: calc(100vh - 180px);
+  }
+
+  button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  form {
+    padding: 16px;
+    max-height: calc(100vh - 160px);
+  }
 }

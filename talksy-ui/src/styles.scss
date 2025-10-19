@@ -23,8 +23,8 @@ $light-blue: #cee8fc;
 }
 
 html, body {
-  overflow: hidden;
   height: 100%;
+  overflow: visible;
 }
 
 body {
@@ -71,5 +71,38 @@ body {
   overflow: hidden;
   > img {
     width: 100%;
+  }
+}
+
+/* Global mobile responsiveness */
+@media (max-width: 768px) {
+  html, body {
+    overflow: auto;
+  }
+
+  body {
+    padding-top: 8px;
+  }
+
+  .app-logo {
+    width: 160px;
+    height: 80px;
+  }
+
+  .user-img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-logo {
+    width: 140px;
+    height: 70px;
+  }
+
+  .user-img {
+    width: 32px;
+    height: 32px;
   }
 }

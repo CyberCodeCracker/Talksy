@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.entities.message;
 
 import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.common.BaseAuditingEntity;
+import com.amouri_dev.talksy.entities.group_chat.GroupChat;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -34,5 +35,8 @@ public class Message extends BaseAuditingEntity {
     private Long recipientId;
     @Column(name = "MEDIA_PATH")
     private String mediaPath;
+    @ManyToOne
+    @JoinColumn(name = "messages")
+    private GroupChat groupChat;
 
 }

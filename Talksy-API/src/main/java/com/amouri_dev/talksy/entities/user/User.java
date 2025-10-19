@@ -2,6 +2,7 @@ package com.amouri_dev.talksy.entities.user;
 
 import com.amouri_dev.talksy.entities.chat.Chat;
 import com.amouri_dev.talksy.common.BaseAuditingEntity;
+import com.amouri_dev.talksy.entities.group_chat.GroupChat;
 import com.amouri_dev.talksy.entities.role.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -73,6 +74,12 @@ public class User extends BaseAuditingEntity implements UserDetails {
 
     @OneToMany(mappedBy = "recipient")
     private List<Chat> chatsAsReceiver;
+
+    @OneToMany(mappedBy = "creator")
+    private List<GroupChat> groupChatsAsCreator;
+
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "participants")
+    private Set<GroupChat> groupChats;
 
     @ManyToMany(
             cascade = {CascadeType.PERSIST, CascadeType.MERGE},

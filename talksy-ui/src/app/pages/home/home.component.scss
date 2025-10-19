@@ -149,3 +149,57 @@ i {
   left: 350px;
   bottom: 50px;
 }
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .main {
+    align-items: stretch;
+  }
+
+  .header {
+    height: 60px;
+  }
+
+  .main-container {
+    width: 100%;
+    height: 100vh;
+    box-shadow: none;
+  }
+
+  /* Stack sidebar and chat area */
+  .main-container .d-flex.w-100 {
+    flex-direction: column;
+  }
+
+  .main-container .col-3,
+  .main-container .col-9 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Expand message bubbles on small screens */
+  .message-box {
+    &.self > div,
+    &.friend > div {
+      max-width: 85%;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Keep emojis panel within viewport */
+  .emojis-panel {
+    left: 0;
+    right: 0;
+    bottom: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .message-box {
+    &.self > div,
+    &.friend > div {
+      max-width: 92%;
+      font-size: 1rem;
+    }
+  }
+}
