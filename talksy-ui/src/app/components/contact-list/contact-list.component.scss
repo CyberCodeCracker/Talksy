@@ -1,3 +1,9 @@
+.fa-comment-medical, .fa-times-circle {
+  &:hover {
+    color: blue;
+  }
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .sticky-top.bg-white {

@@ -24,7 +24,24 @@ $light-blue: #cee8fc;
 
 html, body {
   height: 100%;
-  overflow: visible;
+  margin: 0; /* Ensure no default margins cause issues */
+  overflow-x: hidden; /* Prevent horizontal overflow */
+  overflow-y: auto; /* Allow vertical overflow with scrolling */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge) */
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+html, body {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Optional: Ensure compatibility for older browsers */
+body {
+  -ms-overflow-style: none; /* Internet Explorer and Edge (legacy) */
 }
 
 body {

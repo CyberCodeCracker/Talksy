@@ -136,11 +136,9 @@ i {
 .fa-door-open,
 .fa-user
 {
-  color: blue;
-  padding: 1px;
   border-radius: 50%;
   &:hover {
-    background-color: lightblue;
+    color: blue;
   }
 }
 

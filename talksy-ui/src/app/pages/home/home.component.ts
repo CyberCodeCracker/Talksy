@@ -51,6 +51,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
   selectedChat: ChatResponse = {};
   chatMessages: Array<MessageResponse> = [];
   currentUserId: number | null = null;
+  private usersById: Map<number, UserResponse> = new Map<number, UserResponse>();
   showEmojis: boolean = false;
   messageContent: string = '';
   recipientId = this.getSenderId();
@@ -71,7 +72,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   ngOnInit(): void {
     this.loadCurrentUser();
-    this.loadChats();
   }
 
   ngAfterViewChecked(): void {
@@ -111,9 +111,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   chatSelected(chatResponse: ChatResponse) {
     this.selectedChat = chatResponse;
-    this.getAllChatMessages(chatResponse.id ? chatResponse.id : 0);
-    this.setMessagesToSeen();
-    this.selectedChat.unreadChatsCount = 0;
+    if (chatResponse.id) {
+      this.getAllChatMessages(chatResponse.id);
+      this.setMessagesToSeen();
+      this.selectedChat.unreadChatsCount = 0;
+    } else {
+      this.chatMessages = [];
+    }
     console.log('Is recipient online: ' + this.selectedChat.recipientOnline);
   }
 
@@ -123,36 +127,63 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage() {
     if (this.messageContent) {
-      const messageRequest: MessageRequest = {
-        chatId: this.selectedChat.id,
-        senderId: this.getSenderId(),
-        receiverId: this.getRecipientId(),
-        content: this.messageContent,
-        messageType: 'TEXT',
+      const ensureChat$ = (!this.selectedChat.id)
+        ? this.chatService.createChat({
+            'sender-id': this.getSenderId()!,
+            'recipient-id': this.getRecipientId()!,
+          })
+        : undefined;
+
+      const proceed = (chatId: number | undefined) => {
+        if (chatId && !this.selectedChat.id) {
+          // Assign id and add to list if not already present
+          this.selectedChat.id = chatId;
+          const idx = this.chats.findIndex(c => c.id === chatId);
+          if (idx >= 0) {
+            this.chats[idx] = { ...this.chats[idx], ...this.selectedChat };
+          } else {
+            this.chats.unshift({ ...this.selectedChat });
+          }
+        }
+
+        const messageRequest: MessageRequest = {
+          chatId: this.selectedChat.id,
+          senderId: this.getSenderId(),
+          receiverId: this.getRecipientId(),
+          content: this.messageContent,
+          messageType: 'TEXT',
+        };
+        const subscription = this.messageService
+          .saveMessage({ body: messageRequest })
+          .subscribe({
+            next: () => {
+              const message: MessageResponse = {
+                senderId: this.getSenderId(),
+                recipientId: this.getRecipientId(),
+                message: this.messageContent,
+                type: 'TEXT',
+                state: 'SENT',
+                createdAt: new Date().toString(),
+              };
+              this.selectedChat.lastMessage = this.messageContent;
+              this.selectedChat.lastMessageTime = new Date().toString();
+              this.chatMessages.push(message);
+              this.messageContent = '';
+              this.showEmojis = false;
+            },
+          });
+        this.destroyRef.onDestroy(() => subscription.unsubscribe());
       };
-      const subscription = this.messageService
-        .saveMessage({
-          body: messageRequest,
-        })
-        .subscribe({
-          next: () => {
-            const message: MessageResponse = {
-              senderId: this.getSenderId(),
-              recipientId: this.getRecipientId(),
-              message: this.messageContent,
-              type: 'TEXT',
-              state: 'SENT',
-              createdAt: new Date().toString(),
-            };
-            this.selectedChat.lastMessage = this.messageContent;
-            this.chatMessages.push(message);
-            this.messageContent = '';
-            this.showEmojis = false;
-          },
+
+      if (ensureChat$) {
+        const sub = ensureChat$.subscribe({
+          next: (res) => proceed(res.id!),
+          error: (err) => console.error('Error creating chat before sending message:', err)
         });
-      this.destroyRef.onDestroy(() => {
-        subscription.unsubscribe();
-      });
+        this.destroyRef.onDestroy(() => sub.unsubscribe());
+      } else {
+        proceed(this.selectedChat.id);
+      }
     }
   }
 
@@ -255,14 +286,35 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
           break;
       }
     } else {
-      const destChat = this.chats.find(
-        (chat) => chat.id === notification.chatId
-      );
+      const destChat = this.chats.find((chat) => chat.id === notification.chatId);
+      const content = (notification as any).content ?? notification.message;
       if (destChat && notification.type !== 'SEEN') {
-        const content = (notification as any).content ?? notification.message;
         destChat.lastMessage = content || 'Attachment';
         destChat.lastMessageTime = new Date().toString();
         destChat.unreadChatsCount = (destChat.unreadChatsCount ?? 0) + 1;
+        // Update presence/name if we know the counterparty
+        const otherId = destChat.senderId === this.currentUserId ? destChat.recipientId : destChat.senderId;
+        const otherUser = otherId != null ? this.usersById.get(otherId) : undefined;
+        if (otherUser) {
+          destChat.name = (otherUser.nickname && otherUser.nickname.trim()) ? otherUser.nickname : destChat.name;
+          destChat.recipientOnline = otherUser.online ?? destChat.recipientOnline;
+        }
+      }
+      // If chat does not exist yet (first-time message), create a minimal entry using user map when available
+      if (!destChat && notification.chatId && notification.type !== 'SEEN') {
+        const otherId = notification.senderId === this.currentUserId ? notification.recipientId : notification.senderId;
+        const otherUser = otherId != null ? this.usersById.get(otherId!) : undefined;
+        const newChat: ChatResponse = {
+          id: notification.chatId,
+          name: (otherUser?.nickname && otherUser.nickname.trim()) ? otherUser.nickname : (notification.chatName || 'New chat'),
+          lastMessage: content || 'Attachment',
+          lastMessageTime: new Date().toString(),
+          senderId: notification.senderId,
+          recipientId: notification.recipientId,
+          recipientOnline: otherUser?.online,
+          unreadChatsCount: 1,
+        };
+        this.chats.unshift(newChat);
       }
     }
   }
@@ -274,6 +326,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
         console.log('Current user ID:', this.currentUserId);
         if (this.currentUserId) {
           this.initWebSocket();
+          this.loadChats();
         } else {
           console.error('Cannot initialize WebSocket: currentUserId is null');
         }
@@ -372,8 +425,33 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
   private loadChats(): void {
     const subscription = this.chatService.getAllChatsByRecipientId().subscribe({
       next: (chats) => {
-        this.chats = chats;
-        console.log('Loaded chats:', chats);
+        const sub2 = this.userService.getUsers().subscribe({
+          next: (users: UserResponse[]) => {
+            this.usersById = new Map<number, UserResponse>();
+            (users || []).forEach((u) => {
+              if (u.id != null) this.usersById.set(u.id, u);
+            });
+            const currentId = this.currentUserId;
+            this.chats = (chats || []).map((c) => {
+              const otherId = c.senderId === currentId ? c.recipientId : c.senderId;
+              const otherUser = otherId != null ? this.usersById.get(otherId) : undefined;
+              return {
+                ...c,
+                name:
+                  (otherUser?.nickname && otherUser.nickname.trim())
+                    ? otherUser.nickname
+                    : c.name,
+                recipientOnline: otherUser?.online ?? c.recipientOnline,
+              } as ChatResponse;
+            });
+            console.log('Loaded chats:', this.chats);
+          },
+          error: (err) => {
+            console.error('Error loading users for chat normalization:', err);
+            this.chats = chats;
+          },
+        });
+        this.destroySubscription(sub2);
       },
       error: (err) => {
         console.error('Error loading chats:', err);

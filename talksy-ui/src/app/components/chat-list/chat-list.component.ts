@@ -30,35 +30,24 @@ export class ChatListComponent implements OnInit {
   }
 
   selectContact(contact: UserResponse): void {
-    const userId = this.currentUserId(); 
+    const userId = this.currentUserId();
     if (!userId || !contact.id) {
-      console.error('Cannot create chat: userId or contact.id is null', { userId, contactId: contact.id });
+      console.error('Cannot select contact: userId or contact.id is null', { userId, contactId: contact.id });
       return;
     }
-    this.chatService.createChat({
-      'sender-id': userId,
-      'recipient-id': contact.id
-    }).subscribe({
-      next: (res) => {
-        const chat: ChatResponse = {
-          ...res,
-          id: res.id,
-          name: contact.nickname || `${contact.firstName ?? ''} ${contact.lastName ?? ''}`.trim(),
-          recipientOnline: contact.online,
-          lastMessage: res.lastMessage ?? '',
-          lastMessageTime: res.lastMessageTime ?? contact.lastSeen,
-          senderId: this.currentUserId() ?? undefined,
-          recipientId: contact.id,
-          unreadChatsCount: 0
-        };
-        this.chats().unshift(chat);
-        this.searchNewContactChange.emit(false);
-        this.chatSelected.emit(chat);
-      },
-      error: (err) => {
-        console.error('Error creating chat:', err);
-      }
-    });
+    const pendingChat: ChatResponse = {
+      // id intentionally omitted -> chat not created yet
+      name: contact.nickname || `${contact.firstName ?? ''} ${contact.lastName ?? ''}`.trim(),
+      recipientOnline: contact.online,
+      lastMessage: '',
+      lastMessageTime: contact.lastSeen,
+      senderId: userId,
+      recipientId: contact.id,
+      unreadChatsCount: 0
+    };
+    // Do not modify chats list here to avoid persisting an empty chat
+    this.searchNewContactChange.emit(false);
+    this.chatSelected.emit(pendingChat);
   }
 
   wrapMessage(message: string | undefined): string {

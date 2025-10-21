@@ -29,7 +29,7 @@
           (chatSelected)="chatSelected($event)"
         />
       </div>
-      @if (selectedChat.id) {
+      @if (selectedChat && (selectedChat.id || selectedChat.recipientId)) {
       <article class="col-9">
         <div class="d-flex flex-column justify-content-between h-100">
           <div class="dark-gray-bg p-2">

@@ -78,7 +78,7 @@ public class ChatService implements IChatService {
             return mapper.toChatResponse(savedChat, senderId);
         } catch (Exception e) {
             log.error("Error creating chat: {}", e.getMessage(), e);
-            throw e; // Re-throw to get 500 with details
+            throw e; 
         }
     }
 
