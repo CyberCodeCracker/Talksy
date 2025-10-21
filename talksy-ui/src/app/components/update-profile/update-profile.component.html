@@ -1,0 +1,39 @@
+<div
+  class="modal-backdrop"
+  [class.visible]="visible"
+  (click)="onBackdropClick($event)"
+>
+  <div class="modal-card" [class.visible]="visible">
+    <div class="modal-header">
+      <h5>Update profile</h5>
+      <button type="button" class="icon-btn" (click)="close.emit()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="avatar-row">
+        <div class="avatar-preview">
+          <img *ngIf="previewUrl; else defaultAvatar" [src]="previewUrl" alt="Avatar preview" />
+          <ng-template #defaultAvatar>
+            <img src="/assets/images/user.png" alt="Default avatar" />
+          </ng-template>
+        </div>
+        <div class="avatar-actions">
+          <label class="btn btn-secondary">
+            <i class="fas fa-image"></i>
+            &nbsp;Choose picture
+            <input type="file" accept="image/*" (change)="onFileChange($event)" hidden />
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Nickname</label>
+        <input type="text" class="form-control" [(ngModel)]="nickname" placeholder="Your nickname" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-light" (click)="close.emit()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submit()">Save</button>
+    </div>
+  </div>
+</div>

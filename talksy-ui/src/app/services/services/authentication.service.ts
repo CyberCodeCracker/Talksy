@@ -37,9 +37,9 @@ export class AuthenticationService extends BaseService {
    * This method provides access to the full `HttpResponse`, allowing access to response headers.
    * To access only the response body, use `register()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  register$Response(params: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+  register$Response(params?: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
     const obs = register(this.http, this.rootUrl, params, context);
     return obs;
   }
@@ -48,9 +48,9 @@ export class AuthenticationService extends BaseService {
    * This method provides access only to the response body.
    * To access the full response (for headers, for example), `register$Response()` instead.
    *
-   * This method sends `application/json` and handles request body of type `application/json`.
+   * This method sends `multipart/form-data` and handles request body of type `multipart/form-data`.
    */
-  register(params: Register$Params, context?: HttpContext): Observable<void> {
+  register(params?: Register$Params, context?: HttpContext): Observable<void> {
     const resp = this.register$Response(params, context);
     return resp.pipe(
       map((r: StrictHttpResponse<void>): void => r.body)

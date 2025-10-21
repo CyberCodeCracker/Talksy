@@ -69,6 +69,9 @@ public class User extends BaseAuditingEntity implements UserDetails {
     @Column(name = "IS_DELETED")
     private boolean isDeleted;
 
+    @Column(name = "PROFILE_PICTURE")
+    private String profilePicture;
+
     @OneToMany(mappedBy = "sender")
     private List<Chat> chatsAsSender;
 

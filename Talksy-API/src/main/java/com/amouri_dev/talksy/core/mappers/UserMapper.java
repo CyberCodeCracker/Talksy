@@ -16,13 +16,9 @@ public class UserMapper {
     private final PasswordEncoder passwordEncoder;
 
     public void mergeUserInfo(User user, UpdateProfileRequest request) {
-        if (StringUtils.isNotBlank(request.getFirstName())
-                && !user.getFirstName().equals(request.getFirstName())) {
-            user.setFirstName(request.getFirstName());
-        }
-        if (StringUtils.isNotBlank(request.getLastName())
-                && !user.getLastName().equals(request.getLastName())) {
-            user.setLastName(request.getLastName());
+        if (StringUtils.isNotBlank(request.getNickname())
+                && !user.getFirstName().equals(request.getNickname())) {
+            user.setFirstName(request.getNickname());
         }
     }
 
@@ -37,8 +33,7 @@ public class UserMapper {
                 .isLocked(false)
                 .isCredentialsExpired(false)
                 .isEmailVerified(false)
-                .build()
-                ;
+                .build();
     }
 
     public UserResponse toUserResponse(User user) {
@@ -49,7 +44,7 @@ public class UserMapper {
                 .isOnline(user.isUserOnline())
                 .lastSeen(user.getLastSeen())
                 .nickname(user.getNickname())
-                .build()
-                ;
+                .profilePicture(user.getProfilePicture())
+                .build();
     }
 }

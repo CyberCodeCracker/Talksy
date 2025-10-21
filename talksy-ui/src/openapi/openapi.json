@@ -110,11 +110,19 @@
         "operationId": "register",
         "requestBody": {
           "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/RegistrationRequest" }
+            "multipart/form-data": {
+              "schema": {
+                "required": ["request"],
+                "type": "object",
+                "properties": {
+                  "request": {
+                    "$ref": "#/components/schemas/RegistrationRequest"
+                  },
+                  "profilePicture": { "type": "string", "format": "binary" }
+                }
+              }
             }
-          },
-          "required": true
+          }
         },
         "responses": { "201": { "description": "Created" } }
       }
@@ -443,12 +451,11 @@
         }
       },
       "UpdateProfileRequest": {
-        "required": ["firstName", "lastName", "nickname"],
+        "required": ["nickname"],
         "type": "object",
         "properties": {
-          "firstName": { "maxLength": 10, "minLength": 3, "type": "string" },
-          "lastName": { "maxLength": 10, "minLength": 3, "type": "string" },
-          "nickname": { "maxLength": 15, "minLength": 3, "type": "string" }
+          "nickname": { "maxLength": 15, "minLength": 3, "type": "string" },
+          "profilePicture": { "type": "string", "format": "binary" }
         }
       },
       "UpdatePasswordRequest": {
@@ -479,6 +486,7 @@
           "lastName": { "type": "string" },
           "lastSeen": { "type": "string", "format": "date-time" },
           "nickname": { "type": "string" },
+          "profilePicture": { "type": "string" },
           "online": { "type": "boolean" }
         }
       },

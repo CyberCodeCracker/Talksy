@@ -66,6 +66,6 @@ public class FileService implements IFileService {
         if (lastDotIndex == -1) {
             return "";
         }
-        return fileName.substring(lastDotIndex + 1).toLowerCase();
+        return fileName.substring(lastDotIndex).toLowerCase();
     }
 }

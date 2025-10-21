@@ -5,10 +5,11 @@ import com.amouri_dev.talksy.entities.user.auth.AuthenticationResponse;
 import com.amouri_dev.talksy.entities.user.auth.RefreshRequest;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import jakarta.mail.MessagingException;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface IAuthenticationService {
     AuthenticationResponse login(AuthenticationRequest request);
-    void register(RegistrationRequest request) throws MessagingException;
+    void register(RegistrationRequest request, MultipartFile profilePicture) throws MessagingException;
     AuthenticationResponse refreshToken(RefreshRequest request);
     void confirmAccount(String token) throws MessagingException;
 }

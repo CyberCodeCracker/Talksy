@@ -4,7 +4,7 @@
 export interface MessageResponse {
   createdAt?: string;
   id?: number;
-  media?: string[];
+  media?: string;
   message?: string;
   recipientId?: number;
   senderId?: number;

@@ -1,4 +1,4 @@
-import { Component, inject, input, InputSignal, OnInit, output } from '@angular/core';
+import { Component, EventEmitter, inject, input, InputSignal, OnInit, output } from '@angular/core';
 import { ChatResponse, UserResponse } from '../../services/models';
 import { DatePipe } from '@angular/common';
 import { ChatService, UserService } from '../../services/services';
@@ -11,14 +11,14 @@ import { ChatService, UserService } from '../../services/services';
 })
 export class ChatListComponent implements OnInit {
   chats: InputSignal<ChatResponse[]> = input<ChatResponse[]>([]);
+  currentUserId = input<number | null>(); 
   searchNewContact = input<boolean>();
   contactSearch = input<string>('');
   contacts: Array<UserResponse> = [];
   chatSelected = output<ChatResponse>();
   searchNewContactChange = output<boolean>();
-  currentUserId = input<number | null>(); 
+  recipientProfilePicture = output<string>();
 
-  private chatService = inject(ChatService);
   private userService = inject(UserService);
 
   ngOnInit(): void {
@@ -27,6 +27,7 @@ export class ChatListComponent implements OnInit {
 
   chatClicked(chat: ChatResponse): void {
     this.chatSelected.emit(chat);
+    this.recipientProfilePicture.emit(this.getUserById(chat.recipientId!)?.profilePicture || '');
   }
 
   selectContact(contact: UserResponse): void {
@@ -36,7 +37,6 @@ export class ChatListComponent implements OnInit {
       return;
     }
     const pendingChat: ChatResponse = {
-      // id intentionally omitted -> chat not created yet
       name: contact.nickname || `${contact.firstName ?? ''} ${contact.lastName ?? ''}`.trim(),
       recipientOnline: contact.online,
       lastMessage: '',
@@ -45,7 +45,6 @@ export class ChatListComponent implements OnInit {
       recipientId: contact.id,
       unreadChatsCount: 0
     };
-    // Do not modify chats list here to avoid persisting an empty chat
     this.searchNewContactChange.emit(false);
     this.chatSelected.emit(pendingChat);
   }
@@ -63,6 +62,10 @@ export class ChatListComponent implements OnInit {
     return this.contacts.filter(c => (c.nickname || '').toLowerCase().includes(q));
   }
 
+  getUserById(id: number): UserResponse | undefined {
+    return this.contacts.find(user => user.id === id);
+  }
+
   private loadUsers(): void {
     this.userService.getUsers().subscribe({
       next: (users: UserResponse[]) => {
@@ -75,15 +78,4 @@ export class ChatListComponent implements OnInit {
     });
   }
 
-  private loadChats(): void {
-    this.chatService.getAllChatsByRecipientId().subscribe({
-      next: (chats: ChatResponse[]) => {
-        this.contacts = []; 
-        console.log('Loaded chats:', chats);
-      },
-      error: (err) => {
-        console.error('Error loading chats:', err);
-      }
-    });
-  }
 }

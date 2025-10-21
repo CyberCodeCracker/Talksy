@@ -8,4 +8,5 @@ export interface UserResponse {
   lastSeen?: string;
   nickname?: string;
   online?: boolean;
+  profilePicture?: string;
 }

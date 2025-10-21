@@ -17,4 +17,5 @@ public class UserResponse {
     private LocalDateTime lastSeen;
     private boolean isOnline;
     private String nickname;
+    private String profilePicture;
 }

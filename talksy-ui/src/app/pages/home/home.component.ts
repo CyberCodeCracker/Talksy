@@ -30,8 +30,9 @@ import { FormsModule } from '@angular/forms';
 import { EmojiData } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import * as Stomp from 'stompjs';
 import SockJs from 'sockjs-client';
-import { Notification } from './Notification';
+import { notification } from '../../services/models/Notification';
 import { Subscription } from 'rxjs';
+import { UpdateProfileComponent } from '../../components/update-profile/update-profile.component';
 
 @Component({
   selector: 'app-home',
@@ -41,6 +42,7 @@ import { Subscription } from 'rxjs';
     DatePipe,
     PickerComponent,
     FormsModule,
+    UpdateProfileComponent,
   ],
   standalone: true,
   templateUrl: './home.component.html',
@@ -69,6 +71,9 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
   searchNewContact = signal(false);
   contactSearch = signal<string>('');
   chatFilter = signal<'all' | 'unread'>('all');
+  showUpdateProfile: boolean = false;
+  currentUserProfile?: UserResponse;
+  recipientProfilePicture = signal<string>('');
 
   ngOnInit(): void {
     this.loadCurrentUser();
@@ -102,15 +107,19 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     return message.senderId === this.currentUserId;
   }
 
-  userProfile() {}
+  userProfile() {
+    this.showUpdateProfile = true;
+  }
 
   logout() {
     this.tokenService.clearTokens();
     this.router.navigate(['login']);
   }
 
-  chatSelected(chatResponse: ChatResponse) {
+  chatSelected(chatResponse: ChatResponse, recipientProfilePicture: string) {
     this.selectedChat = chatResponse;
+    this.recipientProfilePicture.set(recipientProfilePicture);
+    console.log("Picture : ", this.recipientProfilePicture().valueOf());
     if (chatResponse.id) {
       this.getAllChatMessages(chatResponse.id);
       this.setMessagesToSeen();
@@ -136,7 +145,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
       const proceed = (chatId: number | undefined) => {
         if (chatId && !this.selectedChat.id) {
-          // Assign id and add to list if not already present
           this.selectedChat.id = chatId;
           const idx = this.chats.findIndex(c => c.id === chatId);
           if (idx >= 0) {
@@ -222,7 +230,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
                   message: 'Attachment',
                   type: 'IMAGE',
                   state: 'SENT',
-                  media: [mediaLines],
+                  media: mediaLines,
                   createdAt: new Date().toString(),
                 };
                 this.chatMessages.push(message);
@@ -253,7 +261,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     return htmlInputTarget.files[0];
   }
 
-  private handleNotification(notification: Notification) {
+  private handleNotification(notification: notification) {
     console.log(
       `🔔 Notification [${notification.type}] for chat ${notification.chatId}:`,
       notification
@@ -323,6 +331,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     const subscription = this.userService.getCurrentUser().subscribe({
       next: (user: UserResponse) => {
         this.currentUserId = user.id || null;
+        this.currentUserProfile = user;
         console.log('Current user ID:', this.currentUserId);
         if (this.currentUserId) {
           this.initWebSocket();
@@ -339,6 +348,29 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
     });
+  }
+
+  closeUpdateProfile() {
+    this.showUpdateProfile = false;
+  }
+
+  saveUpdateProfile(evt: { nickname?: string; file?: File | null }) {
+    const req = {
+      firstName: this.currentUserProfile?.firstName || '',
+      lastName: this.currentUserProfile?.lastName || '',
+      nickname: evt.nickname ?? (this.currentUserProfile?.nickname || ''),
+    };
+    const sub = this.userService.udpateProfileInfo({ body: req }).subscribe({
+      next: () => {
+        // Refresh current user and chats to propagate nickname
+        this.loadCurrentUser();
+        this.showUpdateProfile = false;
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+      },
+    });
+    this.destroyRef.onDestroy(() => sub.unsubscribe());
   }
 
   private initWebSocket(): void {
@@ -362,7 +394,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.notificationSubscription = this.socketClient.subscribe(
           subUrl,
           (message: any) => {
-            const notification: Notification = JSON.parse(message.body);
+            const notification: notification = JSON.parse(message.body);
             console.log('Received notification:', notification);
             this.handleNotification(notification);
           },

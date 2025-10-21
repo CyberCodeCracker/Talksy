@@ -26,7 +26,7 @@
           [searchNewContact]="searchNewContact()"
           [contactSearch]="contactSearch()"
           (searchNewContactChange)="updateSearchContact($event)"
-          (chatSelected)="chatSelected($event)"
+          (chatSelected)="chatSelected($event, recipientProfilePicture().valueOf())"
         />
       </div>
       @if (selectedChat && (selectedChat.id || selectedChat.recipientId)) {

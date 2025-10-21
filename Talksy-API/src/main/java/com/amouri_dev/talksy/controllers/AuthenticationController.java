@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,12 +21,13 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final IAuthenticationService authenticationService;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = {"multipart/form-data"})
     @ResponseStatus(code = HttpStatus.CREATED)
     public void register(
-            @Valid @RequestBody final RegistrationRequest request
+            @Valid @RequestPart("request") RegistrationRequest request,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePicture
     ) throws MessagingException {
-        this.authenticationService.register(request);
+        this.authenticationService.register(request, profilePicture);
     }
 
     @PostMapping("/login")

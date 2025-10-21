@@ -10,13 +10,16 @@ import { RequestBuilder } from '../../request-builder';
 import { RegistrationRequest } from '../../models/registration-request';
 
 export interface Register$Params {
-      body: RegistrationRequest
+      body?: {
+'request': RegistrationRequest;
+'profilePicture'?: Blob;
+}
 }
 
-export function register(http: HttpClient, rootUrl: string, params: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
+export function register(http: HttpClient, rootUrl: string, params?: Register$Params, context?: HttpContext): Observable<StrictHttpResponse<void>> {
   const rb = new RequestBuilder(rootUrl, register.PATH, 'post');
   if (params) {
-    rb.body(params.body, 'application/json');
+    rb.body(params.body, 'multipart/form-data');
   }
 
   return http.request(

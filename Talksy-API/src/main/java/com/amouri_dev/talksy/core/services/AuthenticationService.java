@@ -31,6 +31,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -55,6 +56,7 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Value("${app.mail.frontend.activation-url}")
     private String activationUrl;
+    private final FileService fileService;
 
     @Override
     public AuthenticationResponse login(AuthenticationRequest request) {
@@ -83,26 +85,49 @@ public class AuthenticationService implements IAuthenticationService {
 
     @Override
     @Transactional
-    public void register(final RegistrationRequest request) throws MessagingException {
-        checkUserEmail(request.getEmail());
+    public void register(final RegistrationRequest request, final MultipartFile profilePicture) throws MessagingException {
+        try {
+            log.info("Starting registration for email: {}", request.getEmail());
 
-        final Role userRole = this.roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new EntityNotFoundException("Role user does not exist"));
+            checkUserEmail(request.getEmail());
+            log.info("Email check passed");
 
-        final Set<Role> roles = new HashSet<>();
-        roles.add(userRole);
+            final Role userRole = this.roleRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new EntityNotFoundException("Role user does not exist"));
+            log.info("Role found: {}", userRole);
 
-        final User user = this.userMapper.toUser(request);
-        user.setRoles(roles);
-        log.debug("Saving user {}", user);
-        this.userRepository.save(user);
+            final Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
 
-        final List<User> users = new ArrayList<>();
-        users.add(user);
-        user.setRoles(roles);
+            final User user = this.userMapper.toUser(request);
+            log.info("User mapped: {}", user);
 
-        this.roleRepository.save(userRole);
-        sendValidationEmail(user);
+            user.setRoles(roles);
+
+            log.info("Saving user...");
+            User savedUser = this.userRepository.save(user);
+            log.info("User saved with ID: {}", savedUser.getId());
+
+            // Handle profile picture upload if provided
+            if (profilePicture != null && !profilePicture.isEmpty()) {
+                log.info("Processing profile picture...");
+                String filePath = fileService.saveFile(profilePicture, savedUser.getId());
+                if (filePath == null) {
+                    throw new RuntimeException("Failed to save profile picture");
+                }
+                savedUser.setProfilePicture(filePath);
+                this.userRepository.save(savedUser);
+                log.info("Profile picture saved: {}", filePath);
+            }
+
+            log.info("Sending validation email...");
+            sendValidationEmail(savedUser);
+            log.info("Registration completed successfully");
+
+        } catch (Exception e) {
+            log.error("Registration failed for email: {}", request.getEmail(), e);
+            throw e;
+        }
     }
 
     @Transactional

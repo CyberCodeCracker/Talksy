@@ -11,11 +11,8 @@
 
 .register-container {
   min-height: 50vh;
-  /* Keep container within viewport height even with alerts; account for page padding */
   max-height: calc(100vh - 40px);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* smoother on iOS */
-  overscroll-behavior: contain;
   height: auto;
   display: flex;
   flex-direction: column;

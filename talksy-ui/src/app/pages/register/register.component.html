@@ -4,16 +4,14 @@
     <h3 class="text-center text-dark">Register</h3>
     <hr>
     @if (errorMsgs.length) {
-    <div class="alert alert-danger" role="alert">
-      @for (errorMsg of errorMsgs; track errorMsg) {
-      <p class="text-danger">{{ errorMsg }}</p>
-      }
-    </div>
+      <div class="alert alert-danger" role="alert">
+        @for (errorMsg of errorMsgs; track errorMsg) {
+          <p class="text-danger">{{ errorMsg }}</p>
+        }
+      </div>
     }
     <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-      <div
-        class="param-group-container d-flex justify-content-around align-items-center"
-      >
+      <div class="param-group-container d-flex justify-content-around align-items-center">
         <div class="param-group d-flex flex-column gap-3">
           <div class="form-group">
             <label class="form-label" for="firstName">First Name</label>
@@ -22,6 +20,7 @@
               id="firstName"
               class="form-control"
               formControlName="firstName"
+              (blur)="validateControl('firstName')"
               placeholder="Souhail"
             />
           </div>
@@ -32,6 +31,7 @@
               id="lastName"
               class="form-control"
               formControlName="lastName"
+              (blur)="validateControl('lastName')"
               placeholder="Amouri"
             />
           </div>
@@ -42,6 +42,7 @@
               id="nickname"
               class="form-control"
               formControlName="nickname"
+              (blur)="validateControl('nickname')"
               placeholder="CoolName"
             />
           </div>
@@ -55,6 +56,7 @@
               id="email"
               class="form-control"
               formControlName="email"
+              (blur)="validateControl('email')"
               placeholder="name@example.com"
             />
           </div>
@@ -65,17 +67,36 @@
               id="password"
               class="form-control"
               formControlName="password"
+              (blur)="validateControl('password')"
             />
           </div>
           <div class="form-group">
-            <label class="form-label" for="password">Confirm Password</label>
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
             <input
               type="password"
               id="confirmPassword"
               class="form-control"
               formControlName="confirmPassword"
+              (blur)="validateControl('confirmPassword')"
             />
           </div>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center justify-content-start gap-4 mt-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="user-img" style="width:64px;height:64px;border-radius:50%;overflow:hidden;background:#f0f0f0;display:flex;align-items:center;justify-content:center;">
+            @if (previewUrl) {
+              <img [src]="previewUrl" alt="Avatar preview" style="width:100%;height:100%;object-fit:cover;" />
+            } @else {
+              <img src="/assets/images/user.png" alt="Default avatar" style="width:100%;height:100%;object-fit:cover;" />
+            }
+          </div>
+          <label class="btn btn-secondary m-0">
+            <i class="fas fa-image"></i>
+            &nbsp;Choose profile picture
+            <input type="file" accept="image/*" (change)="onFileChange($event.target)" hidden />
+          </label>
         </div>
       </div>
 
@@ -83,19 +104,19 @@
         <button
           type="submit"
           class="d-flex justify-content-center align-items-center gap-1 btn-primary"
+          [disabled]="registrationForm.invalid"
         >
           <em class="fa fa-user-plus"></em>
           &nbsp;Register
         </button>
         <div class="d-flex align-items-center justify-content-center gap-2">
-          Already have an account ?
+          Already have an account?
           <a
             routerLink="/login"
             id="register"
             class="btn-secondary d-flex align-items-center justify-content-center"
           >
             <em class="fas fa-sign-in-alt"></em>
-
             &nbsp;Login
           </a>
         </div>

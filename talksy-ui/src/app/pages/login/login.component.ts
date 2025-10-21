@@ -1,6 +1,6 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { AuthenticationRequest } from '../../services/models';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from '../../services/services';
 import { HttpClient } from '@angular/common/http';
@@ -20,8 +20,8 @@ export class LoginComponent {
   authRequest: AuthenticationRequest = {email: '', password: ''};
   errorMsgs: Array<string> = [];
   loginForm = new FormGroup({
-    email: new FormControl(''),
-    password: new FormControl(''),
+    email: new FormControl('', [Validators.required, Validators.email]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   });
 
   private router = inject(Router);
@@ -33,8 +33,32 @@ export class LoginComponent {
     this.errorMsgs.push(error);  
   }
 
+  private collectValidationErrors(): string[] {
+    const messages: string[] = [];
+    const labels: Record<string, string> = { email: 'Email', password: 'Password' };
+    Object.entries(this.loginForm.controls).forEach(([name, control]) => {
+      const errors = control.errors;
+      if (!errors) return;
+      const label = labels[name] ?? name;
+      if (errors['required']) {
+        messages.push(`${label} is required.`);
+      }
+      if (errors['email']) {
+        messages.push('Email must be a valid email address.');
+      }
+      if (errors['minlength']) {
+        messages.push(`${label} must be at least ${errors['minlength'].requiredLength} characters.`);
+      }
+    });
+    return messages;
+  }
+
   login() {
     this.errorMsgs = [];
+    if (this.loginForm.invalid) {
+      this.errorMsgs = this.collectValidationErrors();
+      return;
+    }
     this.authRequest.email = this.loginForm.value.email ?? '';
     this.authRequest.password = this.loginForm.value.password ?? '';
     const subscription = this.authService.login({

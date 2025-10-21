@@ -6,6 +6,10 @@ import { ConfirmAccountComponent } from './components/confirm-account/confirm-ac
 
 export const routes: Routes = [
   {
+    path: '',
+    component: LoginComponent
+  },
+  {
     path: 'login',
     component: LoginComponent
   },
