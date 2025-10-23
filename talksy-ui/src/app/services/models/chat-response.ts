@@ -8,6 +8,7 @@ export interface ChatResponse {
   name?: string;
   recipientId?: number;
   recipientOnline?: boolean;
+  recipientProfilePicture?: string;
   senderId?: number;
   unreadChatsCount?: number;
 }

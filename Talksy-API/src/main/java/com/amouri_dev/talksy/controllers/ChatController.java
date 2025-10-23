@@ -35,4 +35,5 @@ public class ChatController {
     public List<ChatResponse> getAllChatsByRecipientId(Authentication authentication) {
         return this.chatService.getChatsByRecipientID(authentication);
     }
+
 }

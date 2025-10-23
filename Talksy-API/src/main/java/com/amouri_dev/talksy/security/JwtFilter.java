@@ -1,7 +1,7 @@
 package com.amouri_dev.talksy.security;
 
 import com.amouri_dev.talksy.entities.user.User;
-import com.amouri_dev.talksy.infrastructure.UserRepository; // ✅ ADD
+import com.amouri_dev.talksy.infrastructure.UserRepository;
 import com.amouri_dev.talksy.utils.KeyUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -76,7 +76,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims claims = extractClaims(jwt);
                 if (this.jwtService.isTokenValid(jwt, username)) {
 
-                    // ✅ ADD: Update lastSeen (5 lines)
                     User user = (User) userDetailsService.loadUserByUsername(username);
                     if (user.getLastSeen() == null ||
                             user.getLastSeen().isBefore(LocalDateTime.now().minusSeconds(30))) {

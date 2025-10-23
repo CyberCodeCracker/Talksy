@@ -53,7 +53,7 @@ public class ChatService implements IChatService {
 
     @Override
     @Transactional
-    public ChatResponse createChat(Long senderId, Long recipientId) { // Changed: Return ChatResponse
+    public ChatResponse createChat(Long senderId, Long recipientId) {
         log.info("Creating chat between senderId={} and recipientId={}", senderId, recipientId);
 
         // Check for existing chat

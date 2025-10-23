@@ -25,8 +25,10 @@
           [currentUserId]="currentUserId"
           [searchNewContact]="searchNewContact()"
           [contactSearch]="contactSearch()"
+          [backendBaseUrl]="backendBaseUrl"
           (searchNewContactChange)="updateSearchContact($event)"
-          (chatSelected)="chatSelected($event, recipientProfilePicture().valueOf())"
+          (chatSelected)="chatSelected($event, $event.recipientProfilePicture)"
+          (recipientProfilePicture)="onRecipientProfilePicture($event)"
         />
       </div>
       @if (selectedChat && (selectedChat.id || selectedChat.recipientId)) {
@@ -35,7 +37,10 @@
           <div class="dark-gray-bg p-2">
             <div class="d-flex gap-2">
               <div class="user-img">
-                <img src="/assets/images/user.png" alt="" />
+                <img
+                  [src]="recipientProfilePicture()"
+                  alt="recipient profile picture"
+                />
               </div>
               @if (selectedChat) {
               <div class="d-flex flex-column">
@@ -149,12 +154,26 @@
           </div>
         </div>
       </article>
-      } @else {
-        <div class="d-flex flex-column justify-content-center align-items-center h-100 w-100 bg-chat">
-          <img width="300" src="/assets/images/logo.jpg" alt="">
-          <h2 class="text-black-50">Talksy Chat Application</h2>
-          <p class="text-black-50">...</p>
-        </div>
+      @if(showUpdateProfile) {
+      <app-update-profile
+        [visible]="showUpdateProfile"
+        [currentUser]="currentUserProfile"
+        (saved)="saveUpdateProfile($event)"
+        (close)="closeUpdateProfile()"
+      ></app-update-profile>
+      }
+    } @else {
+      <div
+        class="d-flex flex-column justify-content-center align-items-center h-100 w-100 bg-chat"
+      >
+        <img
+          width="300"
+          src="/assets/images/logo.jpg"
+          alt="image for the logo"
+        />
+        <h2 class="text-black-50">Talksy Chat Application</h2>
+        <p class="text-black-50">...</p>
+      </div>
       }
     </div>
   </div>

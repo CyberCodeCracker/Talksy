@@ -20,11 +20,11 @@ public class ChatMapper {
                 .id(chat.getId())
                 .senderId(chat.getSender().getId())
                 .recipientId(chat.getRecipient().getId())
-                .name(currentUser.getFirstName() + " " + currentUser.getLastName())
+                .name(currentUser.getNickname())
                 .lastMessage(chat.getLastMessage())
                 .lastMessageTime(chat.getLastMessageTime() != null ?
                         LocalDateTime.parse(chat.getLastMessageTime().toString()) : null)
-                .unreadChatsCount(0L)
+                .unreadChatsCount(0)
                 .build();
     }
 }

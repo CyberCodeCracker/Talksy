@@ -19,5 +19,6 @@ public class ChatResponse {
     private boolean isRecipientOnline;
     private Long senderId;
     private Long recipientId;
+    private String recipientProfilePicture;
 
 }

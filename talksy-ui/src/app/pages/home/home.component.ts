@@ -30,7 +30,7 @@ import { FormsModule } from '@angular/forms';
 import { EmojiData } from '@ctrl/ngx-emoji-mart/ngx-emoji';
 import * as Stomp from 'stompjs';
 import SockJs from 'sockjs-client';
-import { notification } from '../../services/models/Notification';
+import { notification } from '../../services/models/notification';
 import { Subscription } from 'rxjs';
 import { UpdateProfileComponent } from '../../components/update-profile/update-profile.component';
 
@@ -53,11 +53,16 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
   selectedChat: ChatResponse = {};
   chatMessages: Array<MessageResponse> = [];
   currentUserId: number | null = null;
-  private usersById: Map<number, UserResponse> = new Map<number, UserResponse>();
+  private usersById: Map<number, UserResponse> = new Map<
+    number,
+    UserResponse
+  >();
   showEmojis: boolean = false;
   messageContent: string = '';
   recipientId = this.getSenderId();
   socketClient: any = null;
+  backendBaseUrl: string = 'http://localhost:8080';
+
   @ViewChild('scrollableDiv') scrollableDiv!: ElementRef<HTMLDivElement>;
 
   private notificationSubscription: any;
@@ -109,6 +114,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   userProfile() {
     this.showUpdateProfile = true;
+    console.log(this.showUpdateProfile);
   }
 
   logout() {
@@ -116,10 +122,62 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.router.navigate(['login']);
   }
 
-  chatSelected(chatResponse: ChatResponse, recipientProfilePicture: string) {
+  private buildPictureUrl(path: string | undefined): string {
+    // If missing or empty, use default avatar
+    if (!path || !path.trim()) {
+      console.log('Profile picture path is empty, using default');
+      return '/assets/images/user.png';
+    }
+    // Handle base64 data (with or without prefix)
+    if (path.startsWith('data:image/')) {
+      console.log('Detected base64 image with prefix');
+      return path; // Use as-is if it already has the correct prefix
+    }
+    if (/^[A-Za-z0-9+/=]+$/.test(path)) {
+      console.log('Detected raw base64, adding prefix');
+      return `data:image/jpg;base64,${path}`; // Add prefix for raw base64
+    }
+    // Handle absolute URL
+    if (/^https?:\/\//i.test(path)) {
+      console.log('Absolute picture URL detected:', path);
+      if (/\/uploads\/users\/user\.png$/i.test(path)) {
+        return '/assets/images/user.png';
+      }
+      return path;
+    }
+    // Handle relative path
+    let normalized = path.replace(/\\/g, '/').replace(/^\.\//, '');
+    console.log('Normalized path is:', normalized);
+    if (normalized.startsWith('/assets/')) {
+      return normalized;
+    }
+    if (normalized.endsWith('/uploads/users/user.png')) {
+      return '/assets/images/user.png';
+    }
+    if (!normalized.startsWith('/')) {
+      normalized = '/' + normalized;
+    }
+    console.log('Backend base URL is:', this.backendBaseUrl);
+    return `${this.backendBaseUrl}${normalized}`;
+  }
+
+  onRecipientProfilePicture(path: string) {
+    const url = this.buildPictureUrl(path);
+    this.recipientProfilePicture.set(url);
+  }
+
+  chatSelected(
+    chatResponse: ChatResponse,
+    recipientProfilePicture: string | undefined
+  ) {
     this.selectedChat = chatResponse;
-    this.recipientProfilePicture.set(recipientProfilePicture);
-    console.log("Picture : ", this.recipientProfilePicture().valueOf());
+    const sourcePath =
+      recipientProfilePicture || chatResponse.recipientProfilePicture;
+    const fullPictureUrl = this.buildPictureUrl(sourcePath);
+    console.log('Profile pic url: ', fullPictureUrl);
+
+    this.recipientProfilePicture.set(fullPictureUrl);
+    console.log('Picture URL: ', this.recipientProfilePicture());
     if (chatResponse.id) {
       this.getAllChatMessages(chatResponse.id);
       this.setMessagesToSeen();
@@ -127,7 +185,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     } else {
       this.chatMessages = [];
     }
-    console.log('Is recipient online: ' + this.selectedChat.recipientOnline);
+    console.log('Is recipient online: ', this.selectedChat.recipientOnline);
   }
 
   onClick() {
@@ -136,7 +194,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sendMessage() {
     if (this.messageContent) {
-      const ensureChat$ = (!this.selectedChat.id)
+      const ensureChat$ = !this.selectedChat.id
         ? this.chatService.createChat({
             'sender-id': this.getSenderId()!,
             'recipient-id': this.getRecipientId()!,
@@ -146,7 +204,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
       const proceed = (chatId: number | undefined) => {
         if (chatId && !this.selectedChat.id) {
           this.selectedChat.id = chatId;
-          const idx = this.chats.findIndex(c => c.id === chatId);
+          const idx = this.chats.findIndex((c) => c.id === chatId);
           if (idx >= 0) {
             this.chats[idx] = { ...this.chats[idx], ...this.selectedChat };
           } else {
@@ -186,7 +244,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
       if (ensureChat$) {
         const sub = ensureChat$.subscribe({
           next: (res) => proceed(res.id!),
-          error: (err) => console.error('Error creating chat before sending message:', err)
+          error: (err) =>
+            console.error('Error creating chat before sending message:', err),
         });
         this.destroyRef.onDestroy(() => sub.unsubscribe());
       } else {
@@ -294,27 +353,42 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
           break;
       }
     } else {
-      const destChat = this.chats.find((chat) => chat.id === notification.chatId);
+      const destChat = this.chats.find(
+        (chat) => chat.id === notification.chatId
+      );
       const content = (notification as any).content ?? notification.message;
       if (destChat && notification.type !== 'SEEN') {
         destChat.lastMessage = content || 'Attachment';
         destChat.lastMessageTime = new Date().toString();
         destChat.unreadChatsCount = (destChat.unreadChatsCount ?? 0) + 1;
-        // Update presence/name if we know the counterparty
-        const otherId = destChat.senderId === this.currentUserId ? destChat.recipientId : destChat.senderId;
-        const otherUser = otherId != null ? this.usersById.get(otherId) : undefined;
+        const otherId =
+          destChat.senderId === this.currentUserId
+            ? destChat.recipientId
+            : destChat.senderId;
+        const otherUser =
+          otherId != null ? this.usersById.get(otherId) : undefined;
         if (otherUser) {
-          destChat.name = (otherUser.nickname && otherUser.nickname.trim()) ? otherUser.nickname : destChat.name;
-          destChat.recipientOnline = otherUser.online ?? destChat.recipientOnline;
+          destChat.name =
+            otherUser.nickname && otherUser.nickname.trim()
+              ? otherUser.nickname
+              : destChat.name;
+          destChat.recipientOnline =
+            otherUser.online ?? destChat.recipientOnline;
         }
       }
-      // If chat does not exist yet (first-time message), create a minimal entry using user map when available
       if (!destChat && notification.chatId && notification.type !== 'SEEN') {
-        const otherId = notification.senderId === this.currentUserId ? notification.recipientId : notification.senderId;
-        const otherUser = otherId != null ? this.usersById.get(otherId!) : undefined;
+        const otherId =
+          notification.senderId === this.currentUserId
+            ? notification.recipientId
+            : notification.senderId;
+        const otherUser =
+          otherId != null ? this.usersById.get(otherId!) : undefined;
         const newChat: ChatResponse = {
           id: notification.chatId,
-          name: (otherUser?.nickname && otherUser.nickname.trim()) ? otherUser.nickname : (notification.chatName || 'New chat'),
+          name:
+            otherUser?.nickname && otherUser.nickname.trim()
+              ? otherUser.nickname
+              : notification.chatName || 'New chat',
           lastMessage: content || 'Attachment',
           lastMessageTime: new Date().toString(),
           senderId: notification.senderId,
@@ -362,7 +436,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
     };
     const sub = this.userService.udpateProfileInfo({ body: req }).subscribe({
       next: () => {
-        // Refresh current user and chats to propagate nickname
         this.loadCurrentUser();
         this.showUpdateProfile = false;
       },
@@ -465,15 +538,19 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewChecked {
             });
             const currentId = this.currentUserId;
             this.chats = (chats || []).map((c) => {
-              const otherId = c.senderId === currentId ? c.recipientId : c.senderId;
-              const otherUser = otherId != null ? this.usersById.get(otherId) : undefined;
+              const otherId =
+                c.senderId === currentId ? c.recipientId : c.senderId;
+              const otherUser =
+                otherId != null ? this.usersById.get(otherId) : undefined;
               return {
                 ...c,
                 name:
-                  (otherUser?.nickname && otherUser.nickname.trim())
+                  otherUser?.nickname && otherUser.nickname.trim()
                     ? otherUser.nickname
                     : c.name,
                 recipientOnline: otherUser?.online ?? c.recipientOnline,
+                recipientProfilePicture:
+                  otherUser?.profilePicture ?? c.recipientProfilePicture,
               } as ChatResponse;
             });
             console.log('Loaded chats:', this.chats);

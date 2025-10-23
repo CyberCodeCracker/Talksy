@@ -20,5 +20,6 @@ public class UpdateProfileRequest {
     )
     private String nickname;
     private MultipartFile profilePicture;
+    private String password;
 
 }

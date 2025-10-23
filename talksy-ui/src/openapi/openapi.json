@@ -396,6 +396,7 @@
           "lastMessageTime": { "type": "string", "format": "date-time" },
           "senderId": { "type": "integer", "format": "int64" },
           "recipientId": { "type": "integer", "format": "int64" },
+          "recipientProfilePicture": { "type": "string" },
           "recipientOnline": { "type": "boolean" }
         }
       },

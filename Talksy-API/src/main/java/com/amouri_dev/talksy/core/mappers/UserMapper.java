@@ -4,6 +4,7 @@ import com.amouri_dev.talksy.entities.user.User;
 import com.amouri_dev.talksy.entities.user.UserResponse;
 import com.amouri_dev.talksy.entities.user.auth.RegistrationRequest;
 import com.amouri_dev.talksy.entities.user.request.UpdateProfileRequest;
+import com.amouri_dev.talksy.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,8 @@ public class UserMapper {
                 && !user.getFirstName().equals(request.getNickname())) {
             user.setFirstName(request.getNickname());
         }
+        if (StringUtils.isNotBlank(request.getPassword()))
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
     }
 
     public User toUser(RegistrationRequest request) {
@@ -44,7 +47,7 @@ public class UserMapper {
                 .isOnline(user.isUserOnline())
                 .lastSeen(user.getLastSeen())
                 .nickname(user.getNickname())
-                .profilePicture(user.getProfilePicture())
+                .profilePicture(FileUtils.readFileFromLocation(user.getProfilePicture()))
                 .build();
     }
 }
